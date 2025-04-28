@@ -23,7 +23,7 @@ export default function UserTypeScreen() {
       });
 
       if (type === 'artist') {
-        router.push('/(onboarding)/artist/name');
+        router.push('/(onboarding)/artist/spotify-search');
       } else {
         router.push('/(onboarding)/listener/name');
       }
