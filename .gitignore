@@ -9,6 +9,8 @@ expo-env.d.ts
 .env.*
 !.env.example
 firebase.ts
+google-services.json
+GoogleService-Info.plist
 
 # Dependencies
 node_modules/
