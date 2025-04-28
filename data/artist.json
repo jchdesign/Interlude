@@ -1,0 +1,35 @@
+{
+    "name": "Fly By Midnight",
+    "genre": "Pop",
+    "location": "Los Angeles",
+    "bio": "we are Fly By Midnight, a pop + visual collective from los angeles\n.\n.\n.\nracing through this next album wave...",
+    "spotify_link": "https://open.spotify.com/artist/4rQTEdG6hDVOlDUFKs9EjZ?si=ENnBfcONSE27v7Ey5nIoxA",
+    "apple_music_link": "https://music.apple.com/us/artist/fly-by-midnight/1046396707",
+    "cover_image": "require('../../../assets/images/artist/cover_image.png')",
+    "add_images": [
+        "https://picsum.photos/200",
+        "https://picsum.photos/200",
+        "https://picsum.photos/200",
+        "https://picsum.photos/200"
+    ],
+    "followers": [
+        {"user_id": 1},
+        {"user_id": 2},
+        {"user_id": 3}
+    ],
+    "following": [
+        {"user_id": 11},
+        {"user_id": 12},
+        {"user_id": 13}
+    ],
+    "featured_post": {
+        "handle": "Fly By Midnight",
+        "picture": "'../../../assets/images/profile.png'",
+        "category": "Behind the Scenes",
+        "subcategory": "Interview",
+        "time": "2025-03-09",
+        "caption": "Hello There",
+        "media": "null",
+        "link": "null"
+    }
+}
