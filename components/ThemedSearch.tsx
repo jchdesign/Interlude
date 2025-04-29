@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -14,20 +14,33 @@ interface ThemedSearchProps<T> {
   debounceTime?: number;
 }
 
-export function ThemedSearch<T>({
-  placeholder = 'Search...',
-  onSearch,
-  onItemSelect,
-  value,
-  renderItem,
-  keyExtractor,
-  maxHeight = 200,
-  debounceTime = 300,
-}: ThemedSearchProps<T>) {
+export interface ThemedSearchRef {
+  clearSearch: () => void;
+}
+
+export const ThemedSearch = forwardRef<ThemedSearchRef, ThemedSearchProps<any>>((props, ref) => {
+  const {
+    placeholder = 'Search...',
+    onSearch,
+    onItemSelect,
+    value,
+    renderItem,
+    keyExtractor,
+    maxHeight = 200,
+    debounceTime = 300,
+  } = props;
+
   const [searchQuery, setSearchQuery] = useState(value || '');
-  const [results, setResults] = useState<T[]>([]);
+  const [results, setResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useImperativeHandle(ref, () => ({
+    clearSearch: () => {
+      setSearchQuery('');
+      setResults([]);
+    }
+  }));
 
   // Update searchQuery when value prop changes
   useEffect(() => {
@@ -59,7 +72,7 @@ export function ThemedSearch<T>({
         console.log('Search results:', searchResults);
         setResults(searchResults);
       } catch (error) {
-        console.error('Error searching genres:', error);
+        console.error('Error searching:', error);
         setResults([]);
       } finally {
         setIsLoading(false);
@@ -99,7 +112,6 @@ export function ThemedSearch<T>({
                   onPress={() => {
                     console.log('Selected item:', item);
                     onItemSelect(item);
-                    setSearchQuery((item as any).name || '');
                     setResults([]);
                   }}
                 >
@@ -118,7 +130,7 @@ export function ThemedSearch<T>({
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

@@ -1,0 +1,11 @@
+# Python bytecode
+__pycache__/
+
+# Python virtual environment
+venv/
+*.local
+
+node_modules/
+lib/
+.env
+*.log

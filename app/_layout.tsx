@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { onAuthStateChanged } from '@/firebase';
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import * as Font from 'expo-font';
-import { initializeSpotify } from '@/services/spotify';
+// import { initializeSpotify } from '@/services/spotify';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -28,16 +28,8 @@ export default function RootLayout() {
     loadFonts();
   }, []);
 
-  useEffect(() => {
-    async function initializeServices() {
-      try {
-        await initializeSpotify();
-      } catch (error) {
-        console.error('Failed to initialize Spotify:', error);
-      }
-    }
-    initializeServices();
-  }, []);
+  // Remove or comment out the initializeSpotify call
+  // await initializeSpotify();
 
   const onAuthStateChangedCallback = (user: FirebaseAuthTypes.User | null) => {
     console.log('onAuthStateChanged', user)
