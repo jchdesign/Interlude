@@ -25,6 +25,7 @@ export interface UserData {
   additionalPhotos?: string[];
   similarArtists?: string[];
   followedArtists?: string[];
+  following?: string[];
   // Listener specific fields
   favoriteGenres?: string[];
   favoriteArtists?: string[];

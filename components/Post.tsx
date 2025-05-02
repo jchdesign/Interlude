@@ -26,7 +26,7 @@ export default function Post({ content }: Props) {
       <View style={styles.categoryTag}>
         <ThemedText style={styles.categoryTagText}>{content.category}</ThemedText>
       </View>
-      <ThemedText style={styles.caption}>{content.caption}</ThemedText>
+      <ThemedText>{content.caption}</ThemedText>
       <Image
         style={styles.mediaImage}
         source={{uri: content.media}}
@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
   },
   categoryTag: {
     alignSelf: 'flex-start',
-    paddingTop: 2,
-    paddingBottom: 2,
+    paddingTop: 5,
+    paddingBottom: 5,
     paddingLeft: 10,
     paddingRight: 10,
     borderRadius: 30,

@@ -40,6 +40,26 @@ export default function LocationScreen() {
     }
   };
 
+  // const searchSubgenres = async (searchQuery: string) => {
+  //   try {
+  //     const subgenresRef = collection(db, 'subgenres');
+  //     const q = query(
+  //       subgenresRef,
+  //       orderBy('__name__'),
+  //       startAt(searchQuery),
+  //       endAt(searchQuery + '\uf8ff')
+  //     );
+  //     const snapshot = await getDocs(q);
+  //     return snapshot.docs.map(doc => ({
+  //       id: doc.id,
+  //       name: doc.id
+  //     }));
+  //   } catch (error) {
+  //     console.error('Error searching subgenres:', error);
+  //     return [];
+  //   }
+  // };
+
   const handleNext = async () => {
     try {
       await updateProfileFields({
@@ -71,7 +91,7 @@ export default function LocationScreen() {
         </View>
         
         <View style={styles.inputGroup}>
-          <ThemedSearch<Genre>
+          <ThemedSearch
             placeholder="Genre"
             value={genre}
             onSearch={searchGenres}
@@ -86,10 +106,18 @@ export default function LocationScreen() {
           />
         </View>
         <View style={styles.inputGroup}>
-          <ThemedInput
+          <ThemedSearch
             placeholder="Subgenre"
             value={subgenre}
-            onChangeText={setSubgenre}
+            onSearch={searchGenres}
+            onItemSelect={(selectedSubgenre) => {
+              console.log('Setting subgenre to:', selectedSubgenre.name);
+              setSubgenre(selectedSubgenre.name);
+            }}
+            renderItem={(item) => (
+              <ThemedText>{item.name}</ThemedText>
+            )}
+            keyExtractor={(item) => item.id}
           />
         </View>
       </View>

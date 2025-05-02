@@ -1,5 +1,6 @@
-import { View, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
+import ThemedInput from '@/components/ThemedInput';
 import ButtonNav from '@/components/ButtonNav';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -60,10 +61,8 @@ export default function FavoriteArtistsScreen() {
         Follow artists you love to discover new music
       </ThemedText>
       
-      <TextInput
-        style={styles.searchInput}
+      <ThemedInput
         placeholder="Search artists..."
-        placeholderTextColor="#666"
         value={searchQuery}
         onChangeText={setSearchQuery}
       />

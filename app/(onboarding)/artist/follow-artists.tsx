@@ -1,45 +1,111 @@
-import { View, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import ButtonNav from '@/components/ButtonNav';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Colors } from '@/constants/Colors';
+import { ThemedSearch, ThemedSearchRef } from '@/components/ThemedSearch';
+import { collection, query, where, getDocs, orderBy, startAt, endAt, getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { updateProfileFields } from '@/firestore';
 
-// TODO: Replace with actual app artists
-const MOCK_APP_ARTISTS = [
-  { id: '1', name: 'App Artist 1' },
-  { id: '2', name: 'App Artist 2' },
-  { id: '3', name: 'App Artist 3' },
-  { id: '4', name: 'App Artist 4' },
-];
+interface AppArtist {
+  id: string;
+  name: string;
+  genre: string;
+  location: string;
+  profilePicture?: string;
+}
 
 export default function FollowArtistsScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedArtists, setSelectedArtists] = useState<string[]>([]);
+  const [selectedArtists, setSelectedArtists] = useState<AppArtist[]>([]);
+  const searchRef = useRef<ThemedSearchRef>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleNext = () => {
-    // TODO: Save followed artists to Firestore
-    router.push('../artist/(tabs)/home');
+  const handleSearch = async (searchQuery: string): Promise<AppArtist[]> => {
+    try {
+      const db = getFirestore();
+      const artistsRef = collection(db, 'artists');
+      
+      // Create a query that searches for artists where name starts with the search query
+      const q = query(
+        artistsRef,
+        orderBy('name'),
+        startAt(searchQuery),
+        endAt(searchQuery + '\uf8ff')
+      );
+
+      const querySnapshot = await getDocs(q);
+      const artists: AppArtist[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        artists.push({
+          id: doc.id,
+          name: data.name || '',
+          genre: data.genre || '',
+          location: data.location || '',
+          profilePicture: data.profilePicture,
+        });
+      });
+
+      return artists;
+    } catch (error) {
+      console.error('Error searching artists:', error);
+      setError('Failed to search artists. Please try again.');
+      return [];
+    }
   };
 
-  const toggleArtist = (artistId: string) => {
-    setSelectedArtists(prev => 
-      prev.includes(artistId)
-        ? prev.filter(id => id !== artistId)
-        : [...prev, artistId]
-    );
+  const handleArtistSelect = (artist: AppArtist) => {
+    setSelectedArtists(prev => {
+      const isAlreadySelected = prev.some(a => a.id === artist.id);
+      if (isAlreadySelected) {
+        return prev.filter(a => a.id !== artist.id);
+      } else {
+        return [...prev, artist];
+      }
+    });
+    searchRef.current?.clearSearch();
   };
 
-  const renderItem = ({ item }: { item: typeof MOCK_APP_ARTISTS[0] }) => (
-    <TouchableOpacity
-      style={[
-        styles.artistItem,
-        selectedArtists.includes(item.id) && styles.selectedArtist
-      ]}
-      onPress={() => toggleArtist(item.id)}
-    >
-      <ThemedText>{item.name}</ThemedText>
-    </TouchableOpacity>
+  const handleNext = async () => {
+    if (selectedArtists.length === 0) {
+      setError('Please select at least one artist to follow');
+      return;
+    }
+
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('No user is signed in');
+      }
+
+      // Update the user's following list in Firestore
+      await updateProfileFields({
+        following: selectedArtists.map(artist => artist.id)
+      });
+
+      router.push('../../artist/(tabs)/home');
+    } catch (error) {
+      console.error('Error saving followed artists:', error);
+      setError('Failed to save followed artists. Please try again.');
+    }
+  };
+
+  const renderArtistItem = (artist: AppArtist) => (
+    <View style={styles.artistItem}>
+      <Image
+        source={artist.profilePicture ? { uri: artist.profilePicture } : undefined}
+        style={styles.artistImage}
+        resizeMode="cover"
+      />
+      <View style={styles.artistInfo}>
+        <ThemedText type="h2" style={styles.artistName}>{artist.name}</ThemedText>
+        <ThemedText style={styles.artistMeta}>{artist.genre} • {artist.location}</ThemedText>
+      </View>
+    </View>
   );
 
   return (
@@ -49,20 +115,34 @@ export default function FollowArtistsScreen() {
         Stay connected with artists who inspire you
       </ThemedText>
       
-      <TextInput
-        style={styles.input}
-        placeholder="Search for artists..."
-        placeholderTextColor={Colors.dark.textGrey}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+          <ThemedSearch
+            ref={searchRef}
+            placeholder="Search for artists..."
+            onSearch={handleSearch}
+            onItemSelect={handleArtistSelect}
+            renderItem={renderArtistItem}
+            keyExtractor={(artist: AppArtist) => artist.id}
+            maxHeight={300}
+          />
+        </View>
+      </View>
 
-      <FlatList
-        data={MOCK_APP_ARTISTS}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        style={styles.list}
-      />
+      {selectedArtists.length > 0 && (
+        <View style={styles.selectedArtistsContainer}>
+          <ThemedText style={styles.selectedArtistsTitle}>Selected Artists</ThemedText>
+          {selectedArtists.map(artist => (
+            <View key={artist.id} style={styles.selectedArtistItem}>
+              {renderArtistItem(artist)}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {error && (
+        <ThemedText style={styles.errorText}>{error}</ThemedText>
+      )}
 
       <View style={styles.navigation}>
         <ButtonNav onPress={() => router.back()} forward={false} />
@@ -77,27 +157,58 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  input: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: Colors.dark.purple,
-    borderRadius: 8,
-    paddingHorizontal: 15,
+  searchWrapper: {
+    position: 'relative',
+    zIndex: 2,
     marginBottom: 20,
-    color: Colors.dark.text,
   },
-  list: {
-    flex: 1,
-    marginBottom: 100,
+  searchContainer: {
+    width: '100%',
   },
   artistItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.purple,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.dark.darkGrey,
+    marginVertical: 5,
+    borderRadius: 12,
+    overflow: 'hidden',
+    height: 70,
   },
-  selectedArtist: {
-    backgroundColor: Colors.dark.purple,
+  artistImage: {
+    width: 70,
+    height: 70,
+  },
+  artistInfo: {
+    flex: 1,
+    padding: 15,
+  },
+  artistName: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  artistMeta: {
+    fontSize: 14,
+    color: Colors.dark.textGrey,
+  },
+  selectedArtistsContainer: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: Colors.dark.background + '20',
+    position: 'relative',
+    zIndex: 1,
+  },
+  selectedArtistsTitle: {
+    marginBottom: 10,
+    color: Colors.dark.textGrey,
+  },
+  selectedArtistItem: {
+    marginBottom: 10,
+  },
+  errorText: {
+    color: Colors.dark.error,
+    textAlign: 'center',
+    marginTop: 10,
   },
   navigation: {
     flexDirection: 'row',
@@ -108,7 +219,7 @@ const styles = StyleSheet.create({
     right: 20,
   },
   titlePadding: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   subtitlePadding: {
     marginBottom: 20,

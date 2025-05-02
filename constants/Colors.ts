@@ -35,7 +35,7 @@ export const Colors = {
     shayla: '#933273',
     blue: '#6763C6',
     pink: '#D1A5D9',
-    white: '#fff',
+    white: '#E1E1E1',
     error: '#ff3b30',
   },
 };

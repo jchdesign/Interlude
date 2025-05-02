@@ -57,7 +57,7 @@ export default function AdditionalPhotosScreen() {
       setError('Please upload at least one photo before continuing');
       return;
     }
-    router.push('/(onboarding)/artist/similar-artists');
+    router.push('/(onboarding)/artist/follow-artists');
   };
 
   return (

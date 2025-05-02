@@ -29,6 +29,7 @@ interface ArtistData {
   followers: string[];
   following: string[];
   featured_post?: any;
+  spotify_external_url: string;
 }
 
 export default function Profile() {
@@ -139,7 +140,7 @@ export default function Profile() {
               <ThemedText>  Followers</ThemedText>
             </View>
             <View style={styles.linkContainer}>
-              {/* <ThemedText type='h2'>{artistData.following.length}</ThemedText> */}
+              <ThemedText type='h2'>{artistData.following.length}</ThemedText>
               <ThemedText>  Following</ThemedText>
             </View>
           </View>

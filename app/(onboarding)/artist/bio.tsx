@@ -27,9 +27,9 @@ export default function BioScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>Tell us about yourself</ThemedText>
+      <ThemedText type="h1" style={styles.titlePadding}>Add a bio to your profile.</ThemedText>
       <ThemedText type="h3" style={[styles.subtitlePadding, { color: Colors.dark.textGrey, textAlign: 'left' }]}>
-        Write a short bio that describes your music and style
+      This is the place to tell your listeners about all that you are.
       </ThemedText>
       
       <ThemedInput
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#000',
+    justifyContent: 'center',
   },
   titlePadding: {
     paddingBottom: 10,

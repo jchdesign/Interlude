@@ -1,5 +1,6 @@
-import { View, StyleSheet, TextInput } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
+import ThemedInput from '@/components/ThemedInput';
 import ButtonNav from '@/components/ButtonNav';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -25,23 +26,15 @@ export default function NameScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>What's your name?</ThemedText>
-      <ThemedText type="h3" style={[styles.subtitlePadding, { color: Colors.dark.textGrey, textAlign: 'left' }]}>
-        This will be displayed on your profile
-      </ThemedText>
-      
+      <ThemedText type="h1" style={styles.titlePadding}>Let's start with your name and a username.</ThemedText>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          placeholderTextColor="#666"
+        <ThemedInput
+          placeholder="Name"
           value={name}
           onChangeText={setName}
         />
-        <TextInput
-          style={styles.input}
+        <ThemedInput
           placeholder="Username"
-          placeholderTextColor="#666"
           value={username}
           onChangeText={setUsername}
         />
@@ -64,17 +57,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
+    marginTop: 40,
     marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#333',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    color: '#fff',
   },
   navigation: {
     flexDirection: 'row',
