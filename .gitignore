@@ -39,3 +39,6 @@ coverage/
 # Production
 build/
 *.log
+
+# Firebase Functions runtime config
+.functions/runtimeconfig.json
