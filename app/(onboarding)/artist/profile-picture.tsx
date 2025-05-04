@@ -14,33 +14,13 @@ export default function ProfilePictureScreen() {
   const [error, setError] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 
-  const handleImageUploaded = async (url: string) => {
-    console.log('handleImageUploaded called with URL:', url);
+  const handleImageUploaded = async (downloadURL: string) => {
+    console.log('handleImageUploaded called with URL:', downloadURL);
     try {
       setIsUploading(true);
       setError(null);
-
-      const auth = getAuth();
-      const user = auth.currentUser;
-      
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      // Upload image to Firebase Storage
-      console.log('Uploading to Firebase Storage...');
-      const downloadURL = await uploadProfilePicture(url, user.uid);
-      console.log('Firebase Storage upload complete, URL:', downloadURL);
-      
-      if (!downloadURL) {
-        throw new Error('Failed to upload image');
-      }
-
-      // Update user profile with the image URL
-      console.log('Updating Firestore profile...');
+      // Only update Firestore with the download URL, do NOT upload again!
       await updateProfileFields({ profilePicture: downloadURL });
-      console.log('Firestore update complete');
-      
       setUploadedImageUrl(downloadURL);
     } catch (error) {
       console.error('Error updating profile picture:', error);
@@ -61,14 +41,11 @@ export default function ProfilePictureScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={{width: '100%', justifyContent: 'flex-start'}}>
-        <ThemedText type="h1" style={styles.titlePadding}>Add a profile picture</ThemedText>
-        <ThemedText type="h3" style={[styles.subtitlePadding, { color: Colors.dark.textGrey, textAlign: 'left' }]}>
-          Choose a photo that represents you as an artist
-        </ThemedText>
+      <View style={styles.topSection}>
+        <ThemedText type="h1" style={styles.titlePadding}>Add a profile picture.</ThemedText>
+        <ThemedText type="h3" style={[styles.subtitlePadding, { color: Colors.dark.textGrey, textAlign: 'left' }]}>Put yourself in the spotlight. This is your front-page moment.</ThemedText>
       </View>
-      
-      <View style={styles.uploadContainer}>
+      <View style={styles.middleSection}>
         <ProfileImageUpload 
           onImageUploaded={handleImageUploaded}
           initialImage={uploadedImageUrl || undefined}
@@ -84,7 +61,6 @@ export default function ProfilePictureScreen() {
           <ThemedText style={styles.errorText}>{error}</ThemedText>
         )}
       </View>
-
       <View style={styles.navigation}>
         <ButtonNav onPress={() => router.back()} forward={false} />
         <ButtonNav onPress={handleNext} forward={true} />
@@ -97,12 +73,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    alignItems: 'center',
+    backgroundColor: 'black',
   },
-  uploadContainer: {
-    width: '100%',
+  topSection: {
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  middleSection: {
     alignItems: 'center',
-    marginBottom: 20,
+    justifyContent: 'flex-start',
+    marginTop: 100,
   },
   uploadingOverlay: {
     position: 'absolute',

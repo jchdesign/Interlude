@@ -36,7 +36,8 @@
       }
     },
     "extra": {
-      "isDevelopment": true
+      "isDevelopment": true,
+      "firebaseProjectId": "interlude-5d3bf"
     },
     "plugins": [
       "@react-native-firebase/app",

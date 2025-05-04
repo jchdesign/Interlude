@@ -8,6 +8,9 @@ import ButtonNav from '@/components/ButtonNav';
 import { router } from 'expo-router';
 import ThemedInput from '@/components/ThemedInput';
 import { createUserProfile } from '@/firestore';
+import { getAuth } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firestore';
 
 export default function AuthScreen() {
   const [email, setEmail] = useState('');
@@ -18,7 +21,19 @@ export default function AuthScreen() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(email, password);
-      router.push('/artist/(tabs)/home' as const);
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error('No user found after login');
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists()) throw new Error('User profile not found');
+      const userData = userDoc.data();
+      if (userData.role === 'artist') {
+        router.push('/artist/(tabs)/home');
+      } else if (userData.role === 'listener') {
+        router.push('/listener/(tabs)/home');
+      } else {
+        alert('Unknown user role. Please contact support.');
+      }
     } catch(e:any) {
       const err = e as FirebaseError;
       alert("Login Failed: " +  err.message);

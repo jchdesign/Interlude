@@ -12,8 +12,8 @@ export interface SpotifyArtist {
   external_urls: { spotify: string };
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
+const MAX_RETRIES = 0;
+const RETRY_DELAY = 10; // 1 second
 
 const isDevelopment = Constants.expoConfig?.extra?.isDevelopment || false;
 const functions = getFunctions();
@@ -137,7 +137,7 @@ export async function getArtist(artistId: string): Promise<SpotifyArtist | null>
   }
 }
 
-export async function saveArtistToProfile(artist: SpotifyArtist) {
+export async function saveArtistToProfile(artist: SpotifyArtist & { links?: { [key: string]: string } }) {
   const auth = getAuth();
   const user = auth.currentUser;
   
@@ -145,13 +145,14 @@ export async function saveArtistToProfile(artist: SpotifyArtist) {
     throw new Error('No user logged in');
   }
 
-  const artistRef = doc(db, 'artists', user.uid);
-  await updateDoc(artistRef, {
-    spotify_id: artist.id,
+  const userRef = doc(db, 'users', user.uid);
+  await updateDoc(userRef, {
+    spotifyId: artist.id,
     name: artist.name,
-    popularity: artist.popularity,
+    spotifyPopularity: artist.popularity,
     spotify_external_url: artist.external_urls.spotify,
-    profile_picture: artist.images[0]?.url || null,
+    profilePicture: artist.images[0]?.url || null,
+    ...(artist.links ? { links: artist.links } : {}),
     updatedAt: new Date()
   });
 } 

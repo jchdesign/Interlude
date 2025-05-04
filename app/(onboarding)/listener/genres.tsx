@@ -7,7 +7,8 @@ import { Colors } from '@/constants/Colors';
 import { GeneralSearch } from '@/components/GeneralSearch';
 import { FilteredGrid } from '@/components/FilteredGrid';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
-import { db, updateProfileFields } from '@/firestore';
+import { db, updateProfileFields, setListenerVector } from '@/firestore';
+import { getAuth } from 'firebase/auth';
 
 interface Genre {
   id: string;
@@ -55,9 +56,29 @@ export default function GenresScreen() {
 
   const handleNext = async () => {
     try {
+      // Get all genres to create a complete vector
+      const genresRef = collection(db, 'genres');
+      const snapshot = await getDocs(genresRef);
+      const allGenreIds = snapshot.docs.map(doc => doc.id);
+      
+      // Create vector with 1.0 for selected genres and 0 for others
+      const vector: Record<string, number> = {};
+      allGenreIds.forEach(genreId => {
+        vector[genreId] = selectedGenres.includes(genreId) ? 1.0 : 0;
+      });
+
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error('No user logged in');
+
+      // Update user profile with favorite genres
       await updateProfileFields({
         favoriteGenres: selectedGenres
       });
+
+      // Update listener vector
+      await setListenerVector(currentUser.uid, vector);
+
       router.push('/(onboarding)/listener/moods' as const);
     } catch (error) {
       console.error('Error saving genres:', error);

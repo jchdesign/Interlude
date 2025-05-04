@@ -37,7 +37,7 @@ export function FilteredGrid<T>({
         ]}
         onPress={() => onItemSelect(id)}
       >
-        <ThemedText style={styles.itemText}>
+        <ThemedText type="h3">
           {renderLabel(item)}
         </ThemedText>
       </TouchableOpacity>
@@ -50,8 +50,9 @@ export function FilteredGrid<T>({
       renderItem={renderItem}
       keyExtractor={item => getId(item)}
       numColumns={columns}
-      columnWrapperStyle={styles.row}
+      columnWrapperStyle={{ columnGap: 24, ...styles.row }}
       contentContainerStyle={styles.grid}
+      ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
     />
   );
 }
@@ -62,23 +63,16 @@ const styles = StyleSheet.create({
   },
   row: {
     justifyContent: 'space-between',
-    marginBottom: 10,
   },
   gridItem: {
     flex: 1,
-    margin: 5,
-    padding: 20,
-    borderRadius: 15,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 100,
+    aspectRatio: 1,
   },
   selectedItem: {
     borderWidth: 2,
     borderColor: Colors.dark.white,
-  },
-  itemText: {
-    textAlign: 'center',
-    fontSize: 16,
-  },
+  }
 }); 

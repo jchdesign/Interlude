@@ -1,4 +1,4 @@
-import { getFirestore, collection, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, updateDoc, getDoc, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { app } from './firebase';
 
@@ -9,7 +9,7 @@ if (!app) {
 const db = getFirestore(app);
 
 export interface UserData {
-  type: 'artist' | 'listener';
+  role: 'artist' | 'listener';
   name?: string;
   username?: string;
   email: string;
@@ -17,9 +17,16 @@ export interface UserData {
   birthday?: Date;
   // Artist specific fields
   spotifyId?: string;
-  location?: string;
-  genre?: string;
-  subgenre?: string;
+  spotifyPopularity?: number;
+  location?: {
+    name: string;
+    coordinates: {
+      latitude: number;
+      longitude: number;
+    };
+  };
+  displayGenre?: string;
+  displaySubgenre?: string;
   bio?: string;
   coverPhoto?: string;
   additionalPhotos?: string[];
@@ -30,6 +37,7 @@ export interface UserData {
   favoriteGenres?: string[];
   favoriteArtists?: string[];
   moods?: string[];
+  favorite_artists_spotify?: { id: string; name: string }[];
 }
 
 export const createUserProfile = async (userData: UserData) => {
@@ -40,9 +48,7 @@ export const createUserProfile = async (userData: UserData) => {
       throw new Error('No user logged in');
     }
 
-    // Determine which collection to use based on user type
-    const collectionName = userData.type === 'artist' ? 'artists' : 'listeners';
-    const userRef = doc(db, collectionName, user.uid);
+    const userRef = doc(db, 'users', user.uid);
 
     // Check if profile already exists
     const existingDoc = await getDoc(userRef);
@@ -57,7 +63,7 @@ export const createUserProfile = async (userData: UserData) => {
       updatedAt: new Date(),
     });
 
-    console.log('Successfully created user profile in collection:', collectionName);
+    console.log('Successfully created user profile in collection: users');
   } catch (error) {
     console.error('Error creating user profile:', error);
     throw error;
@@ -68,17 +74,8 @@ export const updateUserProfile = async (updates: Partial<UserData>) => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('No user logged in');
 
-  // Get the user's current type to determine which collection to update
   const userRef = doc(db, 'users', user.uid);
-  const userDoc = await getDoc(userRef);
-  const userType = userDoc.data()?.type;
-
-  if (!userType) throw new Error('User type not found');
-
-  const collectionName = userType === 'artist' ? 'artists' : 'listeners';
-  const profileRef = doc(db, collectionName, user.uid);
-  
-  await updateDoc(profileRef, {
+  await updateDoc(userRef, {
     ...updates,
     updatedAt: new Date(),
   });
@@ -92,28 +89,14 @@ export const updateProfileFields = async (fields: Partial<UserData>) => {
       throw new Error('No user logged in');
     }
 
-    // First check if the user exists in either collection
-    const artistRef = doc(db, 'artists', user.uid);
-    const listenerRef = doc(db, 'listeners', user.uid);
-    
-    const [artistDoc, listenerDoc] = await Promise.all([
-      getDoc(artistRef),
-      getDoc(listenerRef)
-    ]);
-
-    let collectionName: string;
-    if (artistDoc.exists()) {
-      collectionName = 'artists';
-    } else if (listenerDoc.exists()) {
-      collectionName = 'listeners';
-    } else {
-      console.error('User profile not found in either collection');
+    const userRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      console.error('User profile not found in users collection');
       throw new Error('User profile not found');
     }
 
-    const profileRef = doc(db, collectionName, user.uid);
-    
-    await updateDoc(profileRef, {
+    await updateDoc(userRef, {
       ...fields,
       updatedAt: new Date(),
     });
@@ -121,6 +104,61 @@ export const updateProfileFields = async (fields: Partial<UserData>) => {
     console.error('Error updating profile:', error);
     throw error;
   }
+};
+
+// --- Following Collection ---
+export const addFollowing = async (follower_id: string, following_id: string) => {
+  const db = getFirestore();
+  const followRef = doc(collection(db, 'following'));
+  await setDoc(followRef, {
+    follow_id: followRef.id,
+    follower_id,
+    following_id,
+    createdAt: new Date(),
+  });
+};
+
+// --- Fans Collection ---
+export const addFan = async (listener_id: string, artist_id: string) => {
+  const db = getFirestore();
+  const fanRef = doc(collection(db, 'fans'));
+  await setDoc(fanRef, {
+    fan_id: fanRef.id,
+    listener_id,
+    artist_id,
+    createdAt: new Date(),
+  });
+};
+
+// --- User Vector Collection ---
+export const setListenerVector = async (user_id: string, vector: Record<string, number>) => {
+  const db = getFirestore();
+  const vectorRef = doc(db, 'listener_vector', user_id);
+  await setDoc(vectorRef, {
+    user_id,
+    vector,
+    date_updated: new Date(),
+  });
+};
+
+// --- Artist Vector Collection ---
+export const setArtistVector = async (user_id: string, vector: Record<string, number>) => {
+  const db = getFirestore();
+  const vectorRef = doc(db, 'artist_vector', user_id);
+  await setDoc(vectorRef, {
+    user_id,
+    vector,
+    date_updated: new Date(),
+  });
+};
+
+// --- Dynamic Genre Vector Handling ---
+// To avoid hardcoding genres, fetch the genres collection and dynamically add genre fields to the vector as needed.
+export const getGenreFields = async (): Promise<string[]> => {
+  const db = getFirestore();
+  const genresRef = collection(db, 'genres');
+  const snapshot = await getDocs(genresRef);
+  return snapshot.docs.map(doc => `genre_${doc.id.toLowerCase()}`);
 };
 
 export { db };

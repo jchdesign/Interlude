@@ -32,7 +32,8 @@ export default function SpotifySearchScreen() {
         name: selectedArtist.name,
         popularity: selectedArtist.popularity,
         external_urls: selectedArtist.external_urls,
-        images: selectedArtist.images
+        images: selectedArtist.images,
+        links: { spotify: selectedArtist.external_urls?.spotify || '' }
       });
       router.push('/(onboarding)/artist/location');
     } catch (error) {

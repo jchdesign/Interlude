@@ -58,7 +58,7 @@ export default function MoodsScreen() {
       await updateProfileFields({
         moods: selectedMoods
       });
-      router.replace('/(onboarding)/listener/profile-picture');
+      router.push('/(onboarding)/listener/follow-artists' as const);
     } catch (error) {
       console.error('Error saving moods:', error);
       alert('Failed to save mood preferences. Please try again.');
@@ -83,7 +83,7 @@ export default function MoodsScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>How are you feeling?</ThemedText>
+      <ThemedText type="h1" style={styles.titlePadding}>Let's set the mood. Select your top vibes.</ThemedText>
       
       <GeneralSearch<Mood>
         onSearch={searchMoods}

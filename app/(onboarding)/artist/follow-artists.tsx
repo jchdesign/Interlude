@@ -7,7 +7,7 @@ import { Colors } from '@/constants/Colors';
 import { ThemedSearch, ThemedSearchRef } from '@/components/ThemedSearch';
 import { collection, query, where, getDocs, orderBy, startAt, endAt, getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { updateProfileFields } from '@/firestore';
+import { updateProfileFields, addFollowing } from '@/firestore';
 
 interface AppArtist {
   id: string;
@@ -25,11 +25,12 @@ export default function FollowArtistsScreen() {
   const handleSearch = async (searchQuery: string): Promise<AppArtist[]> => {
     try {
       const db = getFirestore();
-      const artistsRef = collection(db, 'artists');
+      const usersRef = collection(db, 'users');
       
       // Create a query that searches for artists where name starts with the search query
       const q = query(
-        artistsRef,
+        usersRef,
+        where('role', '==', 'artist'),
         orderBy('name'),
         startAt(searchQuery),
         endAt(searchQuery + '\uf8ff')
@@ -44,7 +45,7 @@ export default function FollowArtistsScreen() {
           id: doc.id,
           name: data.name || '',
           genre: data.genre || '',
-          location: data.location || '',
+          location: data.location?.name || '',
           profilePicture: data.profilePicture,
         });
       });
@@ -70,11 +71,6 @@ export default function FollowArtistsScreen() {
   };
 
   const handleNext = async () => {
-    if (selectedArtists.length === 0) {
-      setError('Please select at least one artist to follow');
-      return;
-    }
-
     try {
       const auth = getAuth();
       const currentUser = auth.currentUser;
@@ -82,10 +78,12 @@ export default function FollowArtistsScreen() {
         throw new Error('No user is signed in');
       }
 
-      // Update the user's following list in Firestore
-      await updateProfileFields({
-        following: selectedArtists.map(artist => artist.id)
-      });
+      // Add following connections in the following collection
+      if (selectedArtists.length > 0) {
+        await Promise.all(selectedArtists.map(artist =>
+          addFollowing(currentUser.uid, artist.id)
+        ));
+      }
 
       router.push('../../artist/(tabs)/home');
     } catch (error) {

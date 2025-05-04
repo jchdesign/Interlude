@@ -1,0 +1,10 @@
+{
+  "spotify": {
+    "client_id": "38eec907fbca47b484c1165b5b9fd0cc",
+    "client_secret": "f2c45b277abd495799f1f3a737e0e081",
+    "redirect_uri": "http://localhost:8081/callback"
+  },
+  "google": {
+    "places_key": "AIzaSyDCwyrNG3ZkrridU-Fo8qYHmNw0q5xBBik"
+  }
+}

@@ -87,6 +87,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     color: Colors.dark.text,
-    fontSize: 16,
+    fontSize: 18,
   },
 }); 

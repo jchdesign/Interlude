@@ -24,6 +24,7 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const handleImagePick = async () => {
+    if (uploading) return; // Prevent double upload
     try {
       console.log('Starting image pick...');
       const uri = await pickImage();
@@ -39,6 +40,7 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
   };
 
   const handleUpload = async (uri: string) => {
+    if (uploading) return; // Prevent double upload
     try {
       console.log('Starting upload...');
       setUploading(true);
@@ -68,7 +70,6 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
       if (!downloadURL) {
         throw new Error('Failed to upload image');
       }
-      
       setImage(downloadURL);
       if (onImageUploaded) {
         console.log('Calling onImageUploaded with:', downloadURL);
@@ -94,12 +95,19 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={
+      type === 'additional'
+        ? [styles.container, { flex: 1, width: '100%', height: '100%' }]
+        : styles.container
+    }>
       <TouchableOpacity
-        style={[
-          styles.imageContainer,
-          type === 'profile' && styles.profileContainer
-        ]}
+        style={
+          type === 'profile'
+            ? styles.profileContainer
+            : type === 'additional'
+              ? styles.additionalContainer
+              : styles.imageContainer
+        }
         onPress={handleImagePick}
         disabled={uploading}
       >
@@ -108,7 +116,8 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
             source={{ uri: image }} 
             style={[
               styles.image,
-              type === 'profile' && styles.profileImage
+              type === 'profile' && styles.profileImage,
+              type === 'additional' && { width: '100%', height: '100%' }
             ]}
             onError={(e) => {
               console.error('Image loading error:', e.nativeEvent.error);
@@ -118,16 +127,14 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
         ) : (
           <View style={[
             styles.placeholder,
-            type === 'profile' && styles.profilePlaceholder
+            type === 'profile' && styles.profilePlaceholder,
+            type === 'additional' && { width: '100%', height: '100%' }
           ]}>
-            <Ionicons name="add" size={40} color={Colors.dark.shayla} />
+            <Ionicons name="add" size={80} color={Colors.dark.pink} />
           </View>
         )}
         {uploading && (
-          <View style={[
-            styles.overlay,
-            type === 'profile' && styles.profileOverlay
-          ]}>
+          <View style={type === 'profile' ? styles.profileOverlay : styles.overlay}>
             <ActivityIndicator size="large" color="#fff" />
           </View>
         )}
@@ -142,11 +149,11 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginVertical: 20,
-    width: '100%',
+    justifyContent: 'center',
   },
   imageContainer: {
     width: '100%',
+    height: '100%',
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: Colors.dark.darkGrey,
@@ -156,6 +163,11 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     backgroundColor: Colors.dark.darkGrey,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    position: 'relative',
   },
   image: {
     width: '100%',
@@ -169,11 +181,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 200,
   },
   profilePlaceholder: {
-    minHeight: 'auto',
-    height: '100%',
+    width: 200,
+    height: 200,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -182,11 +193,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     borderRadius: 100,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   errorText: {
     color: Colors.dark.error,
     marginTop: 10,
     textAlign: 'center',
+  },
+  additionalContainer: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: Colors.dark.darkGrey,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }); 

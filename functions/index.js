@@ -107,3 +107,61 @@ exports.searchSpotifyArtistCors = functions.https.onRequest((req, res) => {
     }
   });
 });
+
+// Get Google Places API key from Firebase config
+const GOOGLE_PLACES_API_KEY = config?.google?.places_key;
+
+// Validate API key
+if (!GOOGLE_PLACES_API_KEY) {
+  console.error('Missing Google Places API key. Please set it using:');
+  console.error('firebase functions:config:set google.places_key="YOUR_API_KEY"');
+}
+
+// Places API proxy with CORS support
+exports.placesProxy = functions.https.onRequest((req, res) => {
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.status(204).send('');
+    return;
+  }
+
+  return cors(req, res, async () => {
+    const input = req.query.input;
+    const type = req.query.type || 'autocomplete';
+    const placeId = req.query.placeId;
+
+    if (!input && !placeId) {
+      res.status(400).json({ error: 'Missing required parameters' });
+      return;
+    }
+
+    try {
+      let url = '';
+      if (type === 'autocomplete') {
+        url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${
+          encodeURIComponent(input)
+        }&types=geocode&key=${GOOGLE_PLACES_API_KEY}`;
+        console.log('Making Places API request to:', url);
+      } else if (type === 'details' && placeId) {
+        url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${
+          placeId
+        }&fields=geometry&key=${GOOGLE_PLACES_API_KEY}`;
+      } else {
+        res.status(400).json({ error: 'Invalid request type' });
+        return;
+      }
+
+      const response = await axios.get(url);
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching places data:', error);
+      res.status(500).json({ 
+        error: 'Error fetching places data',
+        details: error.message
+      });
+    }
+  });
+});

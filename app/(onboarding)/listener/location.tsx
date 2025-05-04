@@ -5,15 +5,101 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { updateProfileFields } from '@/firestore';
 import { Colors } from '@/constants/Colors';
-import ThemedInput from '@/components/ThemedInput';
+import { ThemedSearch } from '@/components/ThemedSearch';
+import Constants from 'expo-constants';
+
+interface LocationResult {
+  id: string;
+  name: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+}
 
 export default function LocationScreen() {
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState<LocationResult | null>(null);
+
+  const searchLocations = async (searchQuery: string): Promise<LocationResult[]> => {
+    if (!searchQuery.trim()) return [];
+    try {
+      const baseUrl = __DEV__
+        ? `http://localhost:5001/${Constants.expoConfig?.extra?.firebaseProjectId}/us-central1/placesProxy`
+        : `https://us-central1-${Constants.expoConfig?.extra?.firebaseProjectId}.cloudfunctions.net/placesProxy`;
+      const response = await fetch(
+        `${baseUrl}?input=${encodeURIComponent(searchQuery)}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.predictions) {
+        return data.predictions.map((prediction: any) => ({
+          id: prediction.place_id,
+          name: prediction.description,
+          coordinates: { latitude: 0, longitude: 0 }, // Will get these later
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('Error searching locations:', error);
+      return [];
+    }
+  };
+
+  const getPlaceDetails = async (placeId: string): Promise<{ latitude: number; longitude: number }> => {
+    try {
+      const baseUrl = __DEV__
+        ? `http://localhost:5001/${Constants.expoConfig?.extra?.firebaseProjectId}/us-central1/placesProxy`
+        : `https://us-central1-${Constants.expoConfig?.extra?.firebaseProjectId}.cloudfunctions.net/placesProxy`;
+      const response = await fetch(
+        `${baseUrl}?type=details&placeId=${placeId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.result?.geometry?.location) {
+        return {
+          latitude: data.result.geometry.location.lat,
+          longitude: data.result.geometry.location.lng,
+        };
+      }
+      throw new Error('No coordinates found');
+    } catch (error) {
+      console.error('Error getting place details:', error);
+      throw error;
+    }
+  };
+
+  const handleLocationSelect = async (selectedLocation: LocationResult) => {
+    try {
+      const coordinates = await getPlaceDetails(selectedLocation.id);
+      setLocation({
+        ...selectedLocation,
+        coordinates,
+      });
+    } catch (error) {
+      console.error('Error getting location coordinates:', error);
+      alert('Failed to get location coordinates. Please try again.');
+    }
+  };
 
   const handleNext = async () => {
+    if (!location) {
+      alert('Please select a location');
+      return;
+    }
     try {
       await updateProfileFields({
-        location,
+        location: {
+          name: location.name,
+          coordinates: location.coordinates,
+        },
       });
       router.push('/(onboarding)/listener/genres' as const);
     } catch (error) {
@@ -30,10 +116,13 @@ export default function LocationScreen() {
       </ThemedText>
       
       <View style={styles.inputContainer}>
-        <ThemedInput
+        <ThemedSearch
           placeholder="Current city"
-          value={location}
-          onChangeText={setLocation}
+          value={location?.name || ''}
+          onSearch={searchLocations}
+          onItemSelect={handleLocationSelect}
+          renderItem={(item) => <ThemedText>{item.name}</ThemedText>}
+          keyExtractor={(item) => item.id}
         />
       </View>
 

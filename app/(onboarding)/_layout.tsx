@@ -14,7 +14,7 @@ export default function OnboardingLayout() {
       
       <Stack.Screen name="listener/name" options={{ headerShown: false }} />
       <Stack.Screen name="listener/genres" options={{ headerShown: false }} />
-      <Stack.Screen name="listener/favorite-artists" options={{ headerShown: false }} />
+      <Stack.Screen name="listener/follow-artists" options={{ headerShown: false }} />
       <Stack.Screen name="listener/moods" options={{ headerShown: false }} />
       <Stack.Screen name="listener/profile-picture" options={{ headerShown: false }} />
     </Stack>

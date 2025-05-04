@@ -6,7 +6,7 @@ import { createUserProfile } from '@/firestore';
 import { auth } from '@/firebase';
 
 export default function UserTypeScreen() {
-  const handleUserTypeSelect = async (type: 'artist' | 'listener') => {
+  const handleUserTypeSelect = async (role: 'artist' | 'listener') => {
     try {
       if (!auth) {
         throw new Error('Authentication not initialized');
@@ -18,11 +18,11 @@ export default function UserTypeScreen() {
       }
 
       await createUserProfile({
-        type,
+        role: role,
         email: user.email,
       });
 
-      if (type === 'artist') {
+      if (role === 'artist') {
         router.push('/(onboarding)/artist/spotify-search');
       } else {
         router.push('/(onboarding)/listener/name');

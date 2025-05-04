@@ -16,39 +16,21 @@ export default function AdditionalPhotosScreen() {
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
-  const handleImageUploaded = async (url: string, index: number) => {
+  const handleImageUploaded = async (downloadURL: string, index: number) => {
+    console.log('handleImageUploaded called with URL:', downloadURL, 'index:', index);
     try {
       setIsUploading(true);
-      setUploadingIndex(index);
       setError(null);
-
-      const auth = getAuth();
-      const user = auth.currentUser;
-      
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      // Upload image to Firebase Storage
-      const downloadURL = await uploadAdditionalPhoto(url, user.uid, index);
-      
-      if (!downloadURL) {
-        throw new Error('Failed to upload image');
-      }
-
-      // Update the uploadedImageUrls array
-      const newUrls = [...uploadedImageUrls];
-      newUrls[index] = downloadURL;
-      setUploadedImageUrls(newUrls);
-
-      // Update user profile with the image URLs
-      await updateProfileFields({ additionalPhotos: newUrls });
+      // Only update Firestore with the download URL, do NOT upload again!
+      const newPhotos = [...uploadedImageUrls];
+      newPhotos[index] = downloadURL;
+      setUploadedImageUrls(newPhotos);
+      await updateProfileFields({ additionalPhotos: newPhotos });
     } catch (error) {
       console.error('Error updating additional photo:', error);
-      setError('Failed to upload photo. Please try again.');
+      setError('Failed to upload additional photo. Please try again.');
     } finally {
       setIsUploading(false);
-      setUploadingIndex(null);
     }
   };
 
@@ -69,42 +51,19 @@ export default function AdditionalPhotosScreen() {
       
       <View style={styles.gridContainer}>
         {[0, 1, 2, 3].map((index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.gridItem}
-            onPress={() => {
-              if (!uploadedImageUrls[index]) {
-                // Handle image pick and upload
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = async (e) => {
-                  const file = (e.target as HTMLInputElement).files?.[0];
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    await handleImageUploaded(url, index);
-                  }
-                };
-                input.click();
-              }
-            }}
-          >
-            {uploadedImageUrls[index] ? (
-              <Image 
-                source={{ uri: uploadedImageUrls[index] }} 
-                style={styles.image}
-              />
-            ) : (
-              <View style={styles.plusContainer}>
-                <Ionicons name="add" size={40} color={Colors.dark.shayla} />
-              </View>
-            )}
+          <View key={index} style={styles.gridItem}>
+            <ProfileImageUpload
+              type="additional"
+              index={index}
+              initialImage={uploadedImageUrls[index]}
+              onImageUploaded={(url) => handleImageUploaded(url, index)}
+            />
             {uploadingIndex === index && (
               <View style={styles.uploadingOverlay}>
                 <ActivityIndicator size="large" color={Colors.dark.purple} />
               </View>
             )}
-          </TouchableOpacity>
+          </View>
         ))}
       </View>
 

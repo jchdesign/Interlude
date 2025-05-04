@@ -33,12 +33,12 @@ export default function CoverPhotoScreen() {
         }
 
         const db = getFirestore();
-        const userDoc = await getDoc(doc(db, 'artists', currentUser.uid));
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
           setName(data.name || '');
           setGenre(data.genre || '');
-          setLocation(data.location || '');
+          setLocation(data.location?.name || '');
           setUploadedImageUrl(data.coverPhoto || null);
         }
       } catch (error) {
@@ -50,33 +50,13 @@ export default function CoverPhotoScreen() {
     fetchUserData();
   }, []);
 
-  const handleImageUploaded = async (url: string) => {
-    console.log('handleImageUploaded called with URL:', url);
+  const handleImageUploaded = async (downloadURL: string) => {
+    console.log('handleImageUploaded called with URL:', downloadURL);
     try {
       setIsUploading(true);
       setError(null);
-
-      const auth = getAuth();
-      const user = auth.currentUser;
-      
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      // Upload image to Firebase Storage
-      console.log('Uploading to Firebase Storage...');
-      const downloadURL = await uploadCoverPhoto(url, user.uid);
-      console.log('Firebase Storage upload complete, URL:', downloadURL);
-      
-      if (!downloadURL) {
-        throw new Error('Failed to upload image');
-      }
-
-      // Update user profile with the image URL
-      console.log('Updating Firestore profile...');
+      // Only update Firestore with the download URL, do NOT upload again!
       await updateProfileFields({ coverPhoto: downloadURL });
-      console.log('Firestore update complete');
-      
       setUploadedImageUrl(downloadURL);
     } catch (error) {
       console.error('Error updating cover photo:', error);
@@ -174,7 +154,8 @@ const styles = StyleSheet.create({
   uploadContainer: {
     width: '100%',
     height: '100%',
-    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1,
   },
   placeholderContainer: {

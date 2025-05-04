@@ -1,9 +1,12 @@
-import { StyleSheet, Dimensions, View, Text, ScrollView, Image, Platform, ImageBackground } from 'react-native';
+import { StyleSheet, Dimensions, View, Text, ScrollView, Image, Platform, ImageBackground, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
+import { Colors } from '@/constants/Colors';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -22,21 +25,38 @@ const screenWidth = Dimensions.get('window').width;
 interface ArtistData {
   name: string;
   genre: string;
-  location: string;
+  location?: { name: string; coordinates?: any };
   bio: string;
   coverPhoto: string;
   additionalPhotos: string[];
-  followers: string[];
+  fans: string[];
   following: string[];
   featured_post?: any;
   spotify_external_url: string;
+  links?: Record<string, string>;
 }
+
+// Map of link keys to Material Community Icons
+const LINK_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
+  spotify: 'spotify',
+  instagram: 'instagram',
+  twitter: 'twitter',
+  facebook: 'facebook',
+  youtube: 'youtube',
+  soundcloud: 'music-circle',
+  apple: 'apple',
+  tiktok: 'video',
+  website: 'web',
+  bandcamp: 'music-circle',
+};
 
 export default function Profile() {
   const [artistData, setArtistData] = useState<ArtistData | null>(null);
   const [loading, setLoading] = useState(true);
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [additionalPhotosUrls, setAdditionalPhotosUrls] = useState<string[]>([]);
+  const [fansCount, setFansCount] = useState<number>(0);
+  const [followingCount, setFollowingCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -50,7 +70,7 @@ export default function Profile() {
         }
 
         // Fetch artist data from Firestore
-        const artistDoc = await getDoc(doc(db, 'artists', user.uid));
+        const artistDoc = await getDoc(doc(db, 'users', user.uid));
         if (artistDoc.exists()) {
           const data = artistDoc.data() as ArtistData;
           setArtistData(data);
@@ -75,6 +95,16 @@ export default function Profile() {
             setAdditionalPhotosUrls(urls);
           }
         }
+
+        // Fetch fans count from 'fans' collection
+        const fansQuery = query(collection(db, 'fans'), where('artist_id', '==', user.uid));
+        const fansSnapshot = await getDocs(fansQuery);
+        setFansCount(fansSnapshot.size);
+
+        // Fetch following count from 'following' collection
+        const followingQuery = query(collection(db, 'following'), where('follower_id', '==', user.uid));
+        const followingSnapshot = await getDocs(followingQuery);
+        setFollowingCount(followingSnapshot.size);
       } catch (error) {
         console.error('Error fetching artist data:', error);
       } finally {
@@ -116,7 +146,7 @@ export default function Profile() {
           <View style={styles.artistInfoWrapper}>
             <ThemedText type='large'>{artistData.genre}</ThemedText>
             <ThemedText type='large'>  |  </ThemedText>
-            <ThemedText type='large'>{artistData.location}</ThemedText>
+            <ThemedText type='large'>{artistData.location?.name ?? ''}</ThemedText>
           </View>
         </View>
       </ImageBackground>
@@ -133,29 +163,35 @@ export default function Profile() {
           <Header text={"About"}/>
           <View style={styles.bioContainer}>
             <ThemedText>{artistData.bio}</ThemedText>
+            <View style={styles.followingContainer}>
+              <View style={styles.linkContainer}>
+                <ThemedText type='h2'>{fansCount}</ThemedText>
+                <ThemedText> Fans</ThemedText>
+              </View>
+              <View style={styles.linkContainer}>
+                <ThemedText type='h2'>{followingCount}</ThemedText>
+                <ThemedText> Following</ThemedText>
+              </View>
+            </View>
+            {artistData.links && Object.keys(artistData.links).length > 0 && (
+              <View style={styles.socialLinksContainer}>
+                {Object.entries(artistData.links).map(([key, url]) => (
+                  <TouchableOpacity
+                    key={key}
+                    style={styles.socialIcon}
+                    onPress={() => WebBrowser.openBrowserAsync(url)}
+                  >
+                    <MaterialCommunityIcons
+                      name={LINK_ICONS[key] || 'link'}
+                      size={36}
+                      color={Colors.dark.white}
+                      style={{ opacity: 0.8 }}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
-          <View style={styles.followingContainer}>
-            <View style={styles.linkContainer}>
-              {/* <ThemedText type='h2'>{artistData.followers.length}</ThemedText> */}
-              <ThemedText>  Followers</ThemedText>
-            </View>
-            <View style={styles.linkContainer}>
-              <ThemedText type='h2'>{artistData.following.length}</ThemedText>
-              <ThemedText>  Following</ThemedText>
-            </View>
-          </View>
-          <View style={styles.followingContainer}>
-            <View style={styles.linkContainerMusic}>
-              <ThemedText>Spotify</ThemedText>
-            </View>
-            <View style={styles.linkContainerMusic}>
-              <ThemedText>Apple Music</ThemedText>
-            </View>
-          </View>
-        </View>
-        <View style={styles.container}>
-          <Header text={"Featured"}/>
-          {artistData.featured_post && <Post content={artistData.featured_post}/>}
         </View>
       </View>
     </ScrollView>
@@ -185,8 +221,9 @@ const styles = StyleSheet.create({
     gap: 20
   },
   linkContainer: {
+    opacity: 0.8,
     flexDirection: 'row',
-    alignItems:'flex-end'
+    alignItems:'flex-end',
   },
   linkContainerMusic: {
     flexDirection: 'row',
@@ -207,10 +244,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   bioContainer: {
-    backgroundColor: '#4A469875',
-    padding: 12,
-    alignSelf: 'flex-start',
-    flexDirection: 'row'
+    flexDirection: 'column',
+    gap: 16
   },
   artistInfoWrapper: {
     backgroundColor: '#4A469899',
@@ -234,5 +269,16 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexWrap: 'wrap',
     width: '100%',
-  }
+  },
+  socialLinksContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  socialIcon: {
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
