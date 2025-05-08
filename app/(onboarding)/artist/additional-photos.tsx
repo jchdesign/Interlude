@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
   gridItem: {
     width: '48%',
-    aspectRatio: 1,
+    aspectRatio: 4/3,
     marginBottom: '4%',
     backgroundColor: Colors.dark.background,
     borderRadius: 8,

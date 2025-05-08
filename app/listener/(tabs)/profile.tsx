@@ -24,6 +24,7 @@ interface ListenerData {
   name: string;
   bio: string;
   profilePicture?: string;
+  username?: string;
 }
 
 export default function Profile() {
@@ -47,6 +48,7 @@ export default function Profile() {
             name: data.name || '',
             bio: data.bio || '',
             profilePicture: data.profilePicture || undefined,
+            username: data.username || '',
           });
         }
 
@@ -96,21 +98,28 @@ export default function Profile() {
           )}
         </View>
       </View>
-      <View style={styles.headerSection}>
+      <View style={styles.container}>
         <ThemedText style={styles.name}>{listenerData.name}</ThemedText>
-        <ThemedText style={styles.bio}>{listenerData.bio}</ThemedText>
-        <View style={styles.countsRow}>
-          <ThemedText style={styles.countText}>{friendsCount} friends</ThemedText>
-          <ThemedText style={styles.countText}>  |  </ThemedText>
-          <ThemedText style={styles.countText}>{followingCount} following</ThemedText>
+        <View style={styles.bioSection}>
+          <ThemedText type='small' style={styles.username}>@{listenerData.username}</ThemedText>
+          <ThemedText style={styles.bio}>{listenerData.bio}</ThemedText>
+          <View style={styles.countsRow}>
+            <ThemedText style={styles.countText}>{friendsCount} friends </ThemedText>
+            <ThemedText style={styles.countText}>{followingCount} following</ThemedText>
+          </View>
         </View>
+        {/* Add more profile sections here as needed */}
       </View>
-      {/* Add more profile sections here as needed */}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.dark.background,
+    paddingRight: 24,
+    paddingLeft: 24,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -131,34 +140,33 @@ const styles = StyleSheet.create({
   purpleBg: {
     width: '100%',
     aspectRatio: 16/9,
-    backgroundColor: Colors.dark.purpleDark,
+    backgroundColor: Colors.dark.purple,
   },
   profilePicWrapper: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: -75, // half of profilePic height
+    bottom: -60, // half of profilePic height
     alignItems: 'center',
     zIndex: 2,
   },
   profilePic: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
     borderRadius: 18,
     backgroundColor: Colors.dark.textGrey,
-    borderWidth: 4,
-    borderColor: Colors.dark.background,
   },
   profilePicPlaceholder: {
     backgroundColor: Colors.dark.textGrey,
   },
-  headerSection: {
-    alignItems: 'center',
+  bioSection: {
+    alignItems: 'flex-start',
     paddingTop: 12, // space for the overlap
     paddingBottom: 32,
     backgroundColor: Colors.dark.background,
   },
   name: {
+    paddingTop: 12,
     fontSize: 24,
     fontWeight: '600',
     color: Colors.dark.white,
@@ -167,10 +175,9 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 16,
-    color: Colors.dark.textGrey,
+    color: Colors.dark.white,
     marginBottom: 16,
-    textAlign: 'center',
-    paddingHorizontal: 24,
+    textAlign: 'left',
   },
   countsRow: {
     flexDirection: 'row',
@@ -183,5 +190,9 @@ const styles = StyleSheet.create({
     color: Colors.dark.textGrey,
     fontSize: 15,
     fontWeight: '400',
+  },
+  username: {
+    color: Colors.dark.textGrey,
+    marginBottom: 10,
   },
 });

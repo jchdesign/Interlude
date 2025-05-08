@@ -1,16 +1,18 @@
-import { View, ScrollView, Text, StyleSheet, ImageBackground, Dimensions, Pressable } from 'react-native'
-import { Link } from 'expo-router'
+import { View, ScrollView, StyleSheet, ImageBackground, Dimensions } from 'react-native'
+import { useEffect, useState } from 'react'
+import { getAuth } from 'firebase/auth'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '@/firestore'
 
-import Post from '@/components/Post';
-import { ThemedText } from '@/components/ThemedText';
+import PostContainer from '@/components/PostContainer'
+import { ThemedText } from '@/components/ThemedText'
 
-import content from '../../../data/content.json';
-
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get('window')
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { Colors } from '@/constants/Colors'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -29,7 +31,43 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-const App = () => {
+export default function Home() {
+  const [posts, setPosts] = useState<any[]>([])
+  const [followingIds, setFollowingIds] = useState<string[]>([])
+
+  useEffect(() => {
+    const fetchFollowingAndPosts = async () => {
+      try {
+        const auth = getAuth()
+        const user = auth.currentUser
+        if (!user) return
+
+        // Get following list
+        const followingQuery = query(collection(db, 'following'), where('follower_id', '==', user.uid))
+        const followingSnapshot = await getDocs(followingQuery)
+        const following = followingSnapshot.docs.map(doc => doc.data().following_id)
+        setFollowingIds(following)
+
+        // Get posts from following
+        const postsQuery = query(collection(db, 'posts'), where('user_id', 'in', following))
+        const postsSnapshot = await getDocs(postsQuery)
+        const postsData = postsSnapshot.docs.map(doc => doc.data())
+
+        // Get user's own posts
+        const userPostsQuery = query(collection(db, 'posts'), where('user_id', '==', user.uid))
+        const userPostsSnapshot = await getDocs(userPostsQuery)
+        const userPostsData = userPostsSnapshot.docs.map(doc => doc.data())
+
+        // Combine user's posts at the top
+        setPosts([...userPostsData, ...postsData])
+      } catch (error) {
+        console.error('Error fetching following and posts:', error)
+      }
+    }
+
+    fetchFollowingAndPosts()
+  }, [])
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.logoContainer}>
@@ -39,26 +77,19 @@ const App = () => {
         ></ImageBackground>
       </View>
       <View style={styles.postsContainer}>
-        <ThemedText type='large'>Feed</ThemedText>
-        {content.map((item) => (
-          <Post content={item}/>
-        ))}
+        <PostContainer posts={posts} />
       </View>
     </ScrollView>
   )
 }
 
-export default App
-
 const styles = StyleSheet.create({
   container: {
     paddingTop: 50,
     paddingLeft: 24,
-    paddingRight: 24
-  },
-  containerTitle: {
-    color: 'white',
-    fontSize: 20
+    paddingRight: 24,
+    paddingBottom: 24,
+    backgroundColor: Colors.dark.background
   },
   logoContainer: {
     height: 45,

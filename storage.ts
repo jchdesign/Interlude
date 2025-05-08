@@ -109,4 +109,39 @@ const uploadImage = async (uri: string, path: string): Promise<string | null> =>
     }
     return null;
   }
+};
+
+// Utility to pick image or video
+export const pickImageOrVideo = async (): Promise<string | null> => {
+  try {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+      return null;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      quality: 0.8,
+    });
+
+    if (result.canceled) {
+      return null;
+    }
+
+    return result.assets[0].uri;
+  } catch (error) {
+    console.error('Error picking media:', error);
+    return null;
+  }
+};
+
+// Utility to upload any media (image or video) for a post
+export const uploadPostMedia = async (uri: string, postId: string): Promise<string | null> => {
+  // Get file extension
+  const extMatch = uri.match(/\.([a-zA-Z0-9]+)$/);
+  const ext = extMatch ? extMatch[1] : 'media';
+  const path = `${STORAGE_PATHS.posts}/${postId}/media/${Date.now()}.${ext}`;
+  return uploadImage(uri, path);
 }; 

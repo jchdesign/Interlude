@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   small: {
-    fontSize: 12,
+    fontSize: 14,
   },
   large: {
     fontSize: 20,
@@ -60,12 +60,10 @@ const styles = StyleSheet.create({
   h1: {
     fontSize: 32,
     fontFamily: 'Figtree-SemiBold',
-    fontWeight: undefined,
   },
   title: {
     fontSize: 64,
     fontFamily: 'Figtree-Black',
-    fontWeight: undefined,
   },
   link: {
     lineHeight: 30,

@@ -26,7 +26,10 @@ export default function NameScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>Let's start with your name and a username.</ThemedText>
+      <View style={styles.content}>
+        <ThemedText type="h1" style={styles.title}>What's your name?</ThemedText>
+        <ThemedText style={styles.subtitle}>Let's get to know each other.</ThemedText>
+      </View>
       <View style={styles.inputContainer}>
         <ThemedInput
           placeholder="Name"
@@ -72,6 +75,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   subtitlePadding: {
+    marginBottom: 20,
+  },
+  content: {
+    marginBottom: 40,
+  },
+  title: {
+    marginBottom: 20,
+  },
+  subtitle: {
     marginBottom: 20,
   },
 }); 

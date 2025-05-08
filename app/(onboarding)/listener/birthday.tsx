@@ -74,24 +74,25 @@ export default function BirthdayScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>When's your birthday?</ThemedText>
-      
-      <View style={styles.inputContainer}>
-        <ThemedInput
-          placeholder="MM / DD / YYYY"
-          value={birthday}
-          onChangeText={(text) => {
-            setBirthday(formatInput(text));
-            setError(null);
-          }}
-          keyboardType="numeric"
-          maxLength={14} // MM / DD / YYYY = 14 characters
-        />
-        {error && (
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
-        )}
+      <View style={styles.centerContent}>
+        <ThemedText type="h1" style={styles.title}>When's your birthday?</ThemedText>
+        <ThemedText style={styles.subtitle}>Help us personalize your experience.</ThemedText>
+        <View style={styles.inputContainer}>
+          <ThemedInput
+            placeholder="MM / DD / YYYY"
+            value={birthday}
+            onChangeText={(text) => {
+              setBirthday(formatInput(text));
+              setError(null);
+            }}
+            keyboardType="numeric"
+            maxLength={14} // MM / DD / YYYY = 14 characters
+          />
+          {error && (
+            <ThemedText style={styles.errorText}>{error}</ThemedText>
+          )}
+        </View>
       </View>
-
       <View style={styles.navigation}>
         <ButtonNav onPress={() => router.back()} forward={false} />
         <ButtonNav onPress={handleNext} forward={true} />
@@ -106,6 +107,11 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
   },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    width: '100%',
+  },
   inputContainer: {
     width: '100%',
     marginBottom: 20,
@@ -118,11 +124,14 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
   },
-  titlePadding: {
+  title: {
+    paddingBottom: 20,
+  },
+  subtitle: {
     paddingBottom: 20,
   },
   errorText: {
-    color: Colors.dark.error,
+    color: Colors.dark.pink,
     marginTop: 8,
   },
 }); 

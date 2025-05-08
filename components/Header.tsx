@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { ThemedText } from './ThemedText';
+import { Colors, hexToRgba } from '@/constants/Colors';
 
 type Props = {text: string}
 
@@ -15,9 +16,10 @@ export function Header({text} : Props) {
 const styles = StyleSheet.create({
     container: {
         padding: 12,
-        backgroundColor: '#78376299',
+        backgroundColor: hexToRgba(Colors.dark.shayla, 0.5),
         flexDirection: 'row',
-        alignSelf: 'flex-start'
+        alignSelf: 'flex-start',
+        paddingRight: 16
     },
     headerText: {
         fontSize: 32,

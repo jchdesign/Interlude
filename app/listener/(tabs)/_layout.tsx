@@ -1,63 +1,103 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
+import { Platform, View, Pressable } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useRouter, usePathname } from 'expo-router';
+import { Stack } from 'expo-router';
+
+interface CustomTabBarButtonProps extends React.ComponentProps<typeof Pressable> {
+  children: React.ReactNode;
+  accessibilityState?: { selected?: boolean };
+}
+
+function CustomTabBarButton({ children, accessibilityState, ...rest }: CustomTabBarButtonProps) {
+  const focused = accessibilityState?.selected ?? false;
+  return (
+    <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} {...rest}>
+      {focused && (
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          width: '80%',
+          height: 5,
+          backgroundColor: Colors.dark.pink,
+        }} />
+      )}
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ height: 80, justifyContent: 'center' }}>
+          <View style={{ alignItems: 'center', justifyContent: 'center', height: 32, width: 32 }}>
+            {children}
+          </View>
+        </View>
+      </View>
+    </Pressable>
+  );
+}
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarShowLabel: false,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-            height: 64,
-            display: 'flex',
-            justifyContent: 'center'
-          },
-          default: {
-            height: 64,
-            display: 'flex',
-            justifyContent: 'center'
-          },
-        }),
-      }}>
-      <Tabs.Screen
-        name="home"
-        options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+    <Stack screenOptions={{ headerShown: false }}>
+      <Tabs
+        screenOptions={({ route }) => {
+          const iconMap: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
+            home: 'home',
+            search: 'magnify',
+            events: 'calendar',
+            profile: 'account-circle-outline',
+          };
+          return {
+            tabBarActiveTintColor: Colors.dark.white,
+            tabBarInactiveTintColor: Colors.dark.white,
+            headerShown: false,
+            tabBarButton: (props) => <CustomTabBarButton {...props} />,
+            tabBarShowLabel: false,
+            tabBarStyle: Platform.select({
+              ios: {
+                position: 'absolute',
+                height: 80,
+                display: 'flex',
+                justifyContent: 'center',
+                backgroundColor: Colors.dark.background,
+                borderTopWidth: 1,
+                borderTopColor: Colors.dark.textGrey,
+              },
+              default: {
+                height: 80,
+                display: 'flex',
+                justifyContent: 'center',
+                backgroundColor: Colors.dark.background,
+                borderTopWidth: 1,
+                borderTopColor: Colors.dark.textGrey,
+              },
+            }),
+            tabBarIcon: ({ color }) => {
+              const iconName = iconMap[route.name] || 'help';
+              return <MaterialCommunityIcons name={iconName} size={32} color={color} />;
+            },
+          };
         }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="notifications"
-        options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bell" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="home"
+          listeners={{
+            tabPress: (e) => {
+              if (pathname !== '/listener/(tabs)/home') {
+                e.preventDefault();
+                router.replace('/listener/(tabs)/home');
+              }
+            },
+          }}
+        />
+        <Tabs.Screen name="search" />
+        <Tabs.Screen name="events" />
+        <Tabs.Screen name="profile" />
+      </Tabs>
+    </Stack>
   );
 }

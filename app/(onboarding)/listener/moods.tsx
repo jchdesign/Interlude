@@ -83,7 +83,10 @@ export default function MoodsScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>Let's set the mood. Select your top vibes.</ThemedText>
+      <View style={styles.content}>
+        <ThemedText type="h1" style={styles.title}>What's your mood?</ThemedText>
+        <ThemedText style={styles.subtitle}>Select your favorite moods to help us recommend music that matches your vibe.</ThemedText>
+      </View>
       
       <GeneralSearch<Mood>
         onSearch={searchMoods}
@@ -114,7 +117,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  titlePadding: {
+  content: {
+    paddingBottom: 20,
+  },
+  title: {
+    paddingBottom: 20,
+  },
+  subtitle: {
     paddingBottom: 20,
   },
   navigation: {

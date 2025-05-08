@@ -10,6 +10,7 @@ interface GeneralSearchProps<T> {
   initialData: T[];
   placeholder?: string;
   debounceMs?: number;
+  onQueryChange?: (query: string) => void;
 }
 
 export function GeneralSearch<T>({ 
@@ -17,14 +18,16 @@ export function GeneralSearch<T>({
   onResultsChange, 
   initialData,
   placeholder = "Search...",
-  debounceMs = 300 
+  debounceMs = 300,
+  onQueryChange
 }: GeneralSearchProps<T>) {
   const [searchText, setSearchText] = useState('');
 
   // Set initial data when component mounts
   useEffect(() => {
     onResultsChange(initialData);
-  }, [initialData]);
+    // eslint-disable-next-line
+  }, []);
 
   const debouncedSearch = useCallback(
     debounce(async (text: string) => {
@@ -42,6 +45,7 @@ export function GeneralSearch<T>({
   const handleSearchChange = (text: string) => {
     setSearchText(text);
     debouncedSearch(text);
+    if (onQueryChange) onQueryChange(text);
   };
 
   return (
@@ -69,7 +73,6 @@ export function GeneralSearch<T>({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     height: 50,
     borderWidth: 1,
-    borderColor: Colors.dark.darkGrey,
+    borderColor: Colors.dark.white,
   },
   searchIcon: {
     marginRight: 10,

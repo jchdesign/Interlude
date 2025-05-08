@@ -3,7 +3,7 @@ import { ThemedText } from '@/components/ThemedText';
 import ButtonNav from '@/components/ButtonNav';
 import { router } from 'expo-router';
 import { useState, useRef } from 'react';
-import { updateProfileFields, addFan } from '@/firestore';
+import { updateProfileFields, addFan, addFollowing } from '@/firestore';
 import { Colors } from '@/constants/Colors';
 import { ThemedSearch, ThemedSearchRef } from '@/components/ThemedSearch';
 
@@ -75,11 +75,18 @@ export default function FavoriteArtistsScreen() {
       if (!currentUser) {
         throw new Error('No user is signed in');
       }
-      // Add fan relationships in the fans collection
+      // Add fan relationships in the fans collection and following relationships in the following collection
       if (selectedArtists.length > 0) {
-        await Promise.all(selectedArtists.map(artist =>
-          addFan(currentUser.uid, artist.id)
-        ));
+        await Promise.all([
+          // Add to fans collection (artist -> listener)
+          ...selectedArtists.map(artist =>
+            addFan(currentUser.uid, artist.id)
+          ),
+          // Add to following collection (listener -> artist)
+          ...selectedArtists.map(artist =>
+            addFollowing(currentUser.uid, artist.id)
+          )
+        ]);
       }
       router.push('/(onboarding)/listener/profile-picture');
     } catch (error) {
@@ -105,49 +112,51 @@ export default function FavoriteArtistsScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>What are your playlist essentials?</ThemedText>
-      <ThemedText type="h3" style={[styles.subtitlePadding, { color: Colors.dark.textGrey, textAlign: 'left' }]}>Choose your favorite artists to help guide your music recommendations.</ThemedText>
-      <View style={styles.searchWrapper}>
-        <View style={styles.searchContainer}>
-          <ThemedSearch
-            ref={searchRef}
-            placeholder="Search for an artist..."
-            onSearch={handleSearch}
-            onItemSelect={handleArtistSelect}
-            renderItem={renderArtistItem}
-            keyExtractor={(artist: FirestoreArtist) => artist.id}
-            maxHeight={300}
-          />
-        </View>
-      </View>
-      {selectedArtists.length > 0 && (
-        <View style={styles.selectedArtistsContainer}>
-          <View style={styles.selectedArtistsGrid}>
-            {selectedArtists.map(artist => (
-              <View key={artist.id} style={styles.selectedArtistItem}>
-                <View style={{ position: 'relative' }}>
-                  <Image
-                    source={artist.profilePicture ? { uri: artist.profilePicture } : undefined}
-                    style={styles.selectedArtistImage}
-                    resizeMode="cover"
-                  />
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    onPress={() => handleArtistSelect(artist)}
-                    activeOpacity={0.7}
-                  >
-                    <ThemedText style={styles.removeButtonText}>-</ThemedText>
-                  </TouchableOpacity>
-                </View>
-                <ThemedText style={styles.selectedArtistName}>{artist.name}</ThemedText>
-              </View>
-            ))}
+      <View style={styles.content}>
+        <ThemedText type="h1" style={styles.title}>Follow Artists</ThemedText>
+        <ThemedText style={styles.subtitle}>Follow artists to get updates on their latest releases and events.</ThemedText>
+        <View style={styles.searchWrapper}>
+          <View style={styles.searchContainer}>
+            <ThemedSearch
+              ref={searchRef}
+              placeholder="Search for an artist..."
+              onSearch={handleSearch}
+              onItemSelect={handleArtistSelect}
+              renderItem={renderArtistItem}
+              keyExtractor={(artist: FirestoreArtist) => artist.id}
+              maxHeight={300}
+            />
           </View>
         </View>
-      )}
-      <View style={styles.navigation}>
-        <ButtonNav onPress={() => router.back()} forward={false} />
-        <ButtonNav onPress={handleNext} forward={true} />
+        {selectedArtists.length > 0 && (
+          <View style={styles.selectedArtistsContainer}>
+            <View style={styles.selectedArtistsGrid}>
+              {selectedArtists.map(artist => (
+                <View key={artist.id} style={styles.selectedArtistItem}>
+                  <View style={{ position: 'relative' }}>
+                    <Image
+                      source={artist.profilePicture ? { uri: artist.profilePicture } : undefined}
+                      style={styles.selectedArtistImage}
+                      resizeMode="cover"
+                    />
+                    <TouchableOpacity
+                      style={styles.removeButton}
+                      onPress={() => handleArtistSelect(artist)}
+                      activeOpacity={0.7}
+                    >
+                      <ThemedText style={styles.removeButtonText}>-</ThemedText>
+                    </TouchableOpacity>
+                  </View>
+                  <ThemedText style={styles.selectedArtistName}>{artist.name}</ThemedText>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+        <View style={styles.navigation}>
+          <ButtonNav onPress={() => router.back()} forward={false} />
+          <ButtonNav onPress={handleNext} forward={true} />
+        </View>
       </View>
     </View>
   );
@@ -157,6 +166,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
+  },
+  content: {
+    flex: 1,
   },
   searchWrapper: {
     position: 'relative',
@@ -245,10 +257,10 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
   },
-  titlePadding: {
+  title: {
     marginBottom: 20,
   },
-  subtitlePadding: {
+  subtitle: {
     marginBottom: 20,
   },
 }); 

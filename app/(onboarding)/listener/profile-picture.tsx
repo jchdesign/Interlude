@@ -18,10 +18,10 @@ export default function ProfilePictureScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>Add a profile picture</ThemedText>
-      <ThemedText type="h3" style={[styles.subtitlePadding, { color: Colors.dark.textGrey, textAlign: 'left' }]}>
-        Choose a photo that represents you
-      </ThemedText>
+      <View style={styles.content}>
+        <ThemedText type="h1" style={styles.title}>Add a profile picture</ThemedText>
+        <ThemedText style={styles.subtitle}>Let others recognize you on Interlude.</ThemedText>
+      </View>
       
       <ProfileImageUpload 
         onImageUploaded={handleImageUploaded}
@@ -51,10 +51,13 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
   },
-  titlePadding: {
+  title: {
     paddingBottom: 20,
   },
-  subtitlePadding: {
+  subtitle: {
     paddingBottom: 20,
+  },
+  content: {
+    alignItems: 'center',
   },
 }); 

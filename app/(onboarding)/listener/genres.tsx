@@ -104,7 +104,10 @@ export default function GenresScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>Let's start by picking some genres.</ThemedText>
+      <View style={styles.content}>
+        <ThemedText type="h1" style={styles.title}>What's your style?</ThemedText>
+        <ThemedText style={styles.subtitle}>Select your favorite genres to help us recommend music you'll love.</ThemedText>
+      </View>
       
       <GeneralSearch<Genre>
         onSearch={searchGenres}
@@ -135,7 +138,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  titlePadding: {
+  content: {
+    paddingBottom: 20,
+  },
+  title: {
+    paddingBottom: 20,
+  },
+  subtitle: {
     paddingBottom: 20,
   },
   navigation: {

@@ -7,6 +7,8 @@ import { onAuthStateChanged } from '@/firebase';
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import * as Font from 'expo-font';
 // import { initializeSpotify } from '@/services/spotify';
+import { PlayerProvider } from '@/context/PlayerContext';
+import Player from '@/components/Player';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -58,24 +60,23 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen 
-          name="(auth)" 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="(onboarding)" 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="artist/(tabs)" 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="listener/(tabs)" 
-          options={{ headerShown: false }}
-        />
-      </Stack>
+      <PlayerProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen 
+            name="(auth)" 
+          />
+          <Stack.Screen 
+            name="(onboarding)" 
+          />
+          <Stack.Screen 
+            name="artist/(tabs)" 
+          />
+          <Stack.Screen 
+            name="listener/(tabs)" 
+          />
+        </Stack>
+        <Player />
+      </PlayerProvider>
     </ThemeProvider>
   );
 }

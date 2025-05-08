@@ -11,7 +11,7 @@ export const Colors = {
     background: '#fff',
     tint: tintColorLight,
     icon: '#000',
-    tabIconDefault: '#ccc',
+    tabIconDefault: '#E1E1E1',
     tabIconSelected: tintColorLight,
     purple: '#502B8C',
     purpleDark: '#2E1753',
@@ -22,12 +22,12 @@ export const Colors = {
     error: '#ff3b30',
   },
   dark: {
-    text: '#fff',
+    text: '#E1E1E1',
     textGrey: '#8C8C8C',
     background: '#1A1A1A',
     tint: tintColorDark,
     icon: '#fff',
-    tabIconDefault: '#ccc',
+    tabIconDefault: '#E1E1E1',
     tabIconSelected: tintColorDark,
     purple: '#502B8C',
     purpleDark: '#2E1753',
@@ -37,5 +37,15 @@ export const Colors = {
     pink: '#D1A5D9',
     white: '#E1E1E1',
     error: '#ff3b30',
+    greyMedium: '#383838',
   },
 };
+
+export function hexToRgba(hex: string, alpha: number): string {
+  hex = hex.replace(/^#/, '');
+  let bigint = parseInt(hex, 16);
+  let r = (bigint >> 16) & 255;
+  let g = (bigint >> 8) & 255;
+  let b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}

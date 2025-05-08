@@ -110,25 +110,25 @@ export default function LocationScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="h1" style={styles.titlePadding}>Where do you call home?</ThemedText>
-      <ThemedText type="h3" style={[styles.subtitlePadding, { color: Colors.dark.textGrey, textAlign: 'left' }]}>
-        To connect you with artists and scenes in your city.
-      </ThemedText>
-      
-      <View style={styles.inputContainer}>
-        <ThemedSearch
-          placeholder="Current city"
-          value={location?.name || ''}
-          onSearch={searchLocations}
-          onItemSelect={handleLocationSelect}
-          renderItem={(item) => <ThemedText>{item.name}</ThemedText>}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
+      <View style={styles.content}>
+        <ThemedText type="h1" style={styles.title}>Where are you?</ThemedText>
+        <ThemedText style={styles.subtitle}>Help us find local artists and events near you.</ThemedText>
+        
+        <View style={styles.inputContainer}>
+          <ThemedSearch
+            placeholder="Current city"
+            value={location?.name || ''}
+            onSearch={searchLocations}
+            onItemSelect={handleLocationSelect}
+            renderItem={(item) => <ThemedText>{item.name}</ThemedText>}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
 
-      <View style={styles.navigation}>
-        <ButtonNav onPress={() => router.back()} forward={false} />
-        <ButtonNav onPress={handleNext} forward={true} />
+        <View style={styles.navigation}>
+          <ButtonNav onPress={() => router.back()} forward={false} />
+          <ButtonNav onPress={handleNext} forward={true} />
+        </View>
       </View>
     </View>
   );
@@ -152,10 +152,14 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
   },
-  titlePadding: {
+  title: {
     paddingBottom: 20,
   },
-  subtitlePadding: {
+  subtitle: {
     paddingBottom: 20,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
   },
 }); 

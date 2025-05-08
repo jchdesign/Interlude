@@ -1,6 +1,10 @@
 import { Stack } from 'expo-router';
 
-export default function OnboardingLayout() {
+export default function Layout() {
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
+
+export function OnboardingLayout() {
   return (
     <Stack>
       <Stack.Screen name="artist/spotify-search" options={{ headerShown: false }} />
