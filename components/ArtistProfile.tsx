@@ -4,9 +4,11 @@ import { getAuth } from 'firebase/auth';
 import { doc, getDoc, collection, getDocs, query, where, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { WebSafeMaterialCommunityIcon } from './ui/WebSafeMaterialCommunityIcon';
 import * as WebBrowser from 'expo-web-browser';
 import { Colors } from '@/constants/Colors';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GlobeAltIcon } from 'react-native-heroicons/outline';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -42,17 +44,14 @@ interface ArtistData {
 }
 
 // Map of link keys to Material Community Icons
-const LINK_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
+const LINK_ICONS: Record<string, string> = {
   spotify: 'spotify',
+  apple: 'apple',
+  soundcloud: 'soundcloud',
+  youtube: 'youtube',
   instagram: 'instagram',
   twitter: 'twitter',
-  facebook: 'facebook',
-  youtube: 'youtube',
-  soundcloud: 'music-circle',
-  apple: 'apple',
-  tiktok: 'video',
-  website: 'web',
-  bandcamp: 'music-circle',
+  tiktok: 'tiktok',
 };
 
 interface ArtistProfileProps {
@@ -271,12 +270,7 @@ export function ArtistProfile({ userId, isOwnProfile, viewerId }: ArtistProfileP
                     style={styles.socialIcon}
                     onPress={() => WebBrowser.openBrowserAsync(url)}
                   >
-                    <MaterialCommunityIcons
-                      name={LINK_ICONS[key] || 'link'}
-                      size={36}
-                      color={Colors.dark.white}
-                      style={{ opacity: 0.8 }}
-                    />
+                    <GlobeAltIcon size={36} color={Colors.dark.white} style={{ opacity: 0.8 }} />
                   </TouchableOpacity>
                 ))}
               </View>

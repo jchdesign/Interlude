@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { PostButton } from '@/components/PostButton';
 import { Colors } from '@/constants/Colors';
+import { ChatBubbleLeftIcon, DocumentTextIcon, VideoCameraIcon, MicrophoneIcon, EllipsisHorizontalIcon } from 'react-native-heroicons/outline';
 
 // Friendly display names for types and categories
 const TYPE_LABELS: Record<string, string> = {
@@ -19,7 +20,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   articles: 'Articles and Blogs',
   video: 'Video Check-In',
   interviews: 'Interviews',
-  shitpost: 'Shitpost',
   more: 'More',
 };
 
@@ -49,18 +49,20 @@ const BTS_CATEGORIES = [
     category: 'interviews',
   },
   {
-    icon: 'emoticon-outline',
-    title: CATEGORY_LABELS['shitpost'],
-    subtitle: 'Tomfoolery and tomfuckery',
-    category: 'shitpost',
-  },
-  {
     icon: 'dots-horizontal',
     title: CATEGORY_LABELS['more'],
     subtitle: 'Anything we missed.',
     category: 'more',
   },
 ];
+
+const ICON_MAP: Record<string, React.ComponentType<any>> = {
+  'message-outline': ChatBubbleLeftIcon,
+  'file-document-outline': DocumentTextIcon,
+  'video-outline': VideoCameraIcon,
+  'account-voice': MicrophoneIcon,
+  'dots-horizontal': EllipsisHorizontalIcon,
+};
 
 export default function SelectBTSCategory() {
   const router = useRouter();
@@ -82,7 +84,7 @@ export default function SelectBTSCategory() {
       {BTS_CATEGORIES.map((cat) => (
         <PostButton
           key={cat.category}
-          icon={cat.icon as any}
+          icon={ICON_MAP[cat.icon]}
           title={cat.title}
           subtitle={cat.subtitle}
           onPress={() => handleCategorySelect(cat.category)}

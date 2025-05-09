@@ -5,7 +5,7 @@ import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { PlayerContext } from '@/context/PlayerContext';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ChevronRightIcon } from 'react-native-heroicons/outline';
 
 interface MusicCardProps {
   songId: string;
@@ -91,7 +91,7 @@ export default function MusicCard({ songId, square = false, profile = false, onP
           <ThemedText style={styles.artistName} numberOfLines={1}>{artist?.name || 'Unknown Artist'}</ThemedText>
           {album && <ThemedText style={styles.albumName} numberOfLines={1}>| {album.title}</ThemedText>}
         </View>
-        <MaterialCommunityIcons name="chevron-right" size={32} color={Colors.dark.textGrey} />
+        <ChevronRightIcon color={Colors.dark.textGrey} size={32} />
       </TouchableOpacity>
     );
   }

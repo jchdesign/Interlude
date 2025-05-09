@@ -92,8 +92,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.background
   },
   logoContainer: {
-    height: 45,
-    marginBottom: 24
+    height: 50,
+    marginBottom: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   postsContainer: {
     display: 'flex',
@@ -101,6 +103,10 @@ const styles = StyleSheet.create({
     gap: 48
   },
   homeLogo: {
+    width: '70%',
+    height: '100%',
+    resizeMode: 'contain',
+    alignSelf: 'center',
   },
   image: {
     width: width,

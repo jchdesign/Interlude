@@ -5,6 +5,7 @@ import { Colors } from '@/constants/Colors';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { createPostFromTemporary, TemporaryPostData } from '@/firestore';
+import { MusicalNoteIcon, RectangleStackIcon } from 'react-native-heroicons/outline';
 
 export default function AddMusic() {
   const router = useRouter();
@@ -38,18 +39,18 @@ export default function AddMusic() {
       </ThemedText>
       <View style={styles.buttonGroup}>
         <PostButton
-          icon="music-note"
+          icon={MusicalNoteIcon}
           title="Song"
-          subtitle="Add one standalone song release"
+          subtitle="Share a single song."
           onPress={() => {
             setPostData(prev => ({ ...prev, category: 'song' }));
             router.push('./add-music?category=song');
           }}
         />
         <PostButton
-          icon="album"
+          icon={RectangleStackIcon}
           title="Album/EP"
-          subtitle="Create a collection of songs"
+          subtitle="Share a collection of songs."
           onPress={() => {
             setPostData(prev => ({ ...prev, category: 'album' }));
             // Navigate to album upload screen

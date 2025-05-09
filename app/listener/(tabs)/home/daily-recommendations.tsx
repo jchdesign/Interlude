@@ -5,7 +5,7 @@ import { getFirestore, getDocs, collection } from 'firebase/firestore';
 import { ThemedText } from '@/components/ThemedText';
 import MusicCard from '@/components/MusicCard';
 import { Colors } from '@/constants/Colors';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ChevronLeftIcon } from 'react-native-heroicons/outline';
 
 export default function DailyRecommendations() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -33,7 +33,7 @@ export default function DailyRecommendations() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <MaterialCommunityIcons name="chevron-left" size={28} color={Colors.dark.white} />
+          <ChevronLeftIcon size={28} color={Colors.dark.white} />
         </TouchableOpacity>
         <ThemedText type="large" style={styles.title}>Daily Recommendations</ThemedText>
       </View>

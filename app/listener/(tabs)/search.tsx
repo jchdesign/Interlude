@@ -24,7 +24,7 @@ interface ArtistProfile {
 }
 
 const MIN_FONT_SIZE = 12;
-const MAX_FONT_SIZE = 20;
+const MAX_FONT_SIZE = 18;
 
 type FitTextBlockProps = {
   text: string;
@@ -96,7 +96,7 @@ function FitTextBlock({ text, containerStyle, textStyle, type = 'h2' }: FitTextB
   );
 }
 
-const SONG_CARD_GAP = 16;
+const SONG_CARD_GAP = 0;
 
 interface SongSearchResult {
   id: string;
@@ -402,18 +402,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'flex-start',
     marginBottom: 20,
-    columnGap: 12,
+    columnGap: 8,
   },
   filterChip: {
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: Colors.dark.greyMedium,
+    backgroundColor: Colors.dark.darkGrey,
     marginHorizontal: 4,
   },
   filterChipActive: {
-    backgroundColor: Colors.dark.pink,
+    backgroundColor: Colors.dark.shayla,
   },
   filterChipText: {
     color: Colors.dark.white,

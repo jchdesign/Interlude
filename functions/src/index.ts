@@ -31,7 +31,7 @@ interface SpotifySearchResponse {
   };
 }
 
-async function getAccessToken(): Promise<string> {
+async function getAccessToken(): Promise<string | null> {
   if (accessToken && tokenExpires && new Date() < tokenExpires) {
     return accessToken;
   }
@@ -41,7 +41,7 @@ async function getAccessToken(): Promise<string> {
   authData.append('grant_type', 'client_credentials');
 
   try {
-    const response = await axios.post<SpotifyAuthResponse>(authUrl, authData, {
+    const response = await axios.post(authUrl, authData, {
       auth: {
         username: SPOTIFY_CLIENT_ID,
         password: SPOTIFY_CLIENT_SECRET
@@ -84,7 +84,7 @@ export const searchSpotifyArtist = functions.https.onRequest(async (req, res) =>
 
     // Search Spotify
     const searchUrl = 'https://api.spotify.com/v1/search';
-    const response = await axios.get<SpotifySearchResponse>(searchUrl, {
+    const response = await axios.get(searchUrl, {
       headers: {
         'Authorization': `Bearer ${token}`
       },
@@ -100,4 +100,73 @@ export const searchSpotifyArtist = functions.https.onRequest(async (req, res) =>
     console.error('Error searching Spotify:', error);
     res.status(500).json({ error: 'Error searching Spotify' });
   }
-}); 
+});
+
+// Feature extraction on audio upload
+export const extractAudioFeatures = functions
+  .region('us-central1')
+  .storage.object()
+  .onFinalize(async (object) => {
+    console.log('extractAudioFeatures triggered with object:', {
+      name: object.name,
+      bucket: object.bucket,
+      contentType: object.contentType,
+      size: object.size,
+      timeCreated: object.timeCreated,
+      updated: object.updated
+    });
+
+    const filePath = object.name;
+    const contentType = object.contentType;
+    if (!filePath || !contentType || !contentType.startsWith('audio/')) {
+      console.log('Skipping non-audio file:', { filePath, contentType });
+      return null;
+    }
+
+    try {
+      // Get the download URL
+      const bucket = admin.storage().bucket(object.bucket);
+      const file = bucket.file(filePath);
+      const [url] = await file.getSignedUrl({
+        action: 'read',
+        expires: Date.now() + 60 * 60 * 1000, // 1 hour
+      });
+      console.log('Generated signed URL:', url);
+
+      // Call your Python API (replace with your actual Cloud Run URL)
+      const response = await axios.post('https://audio-extract-api-634050795095.us-central1.run.app/extract', { audio_url: url });
+      const features = response.data;
+      console.log('Features extracted:', features);
+
+      // Find the song document in Firestore (adjusted for songs/songId/audio/filename.mp3)
+      const parts = filePath.split('/');
+      let songId: string | null = null;
+      if (parts.length >= 4 && parts[0] === 'songs' && parts[2] === 'audio') {
+        songId = parts[1];
+      }
+      console.log('Parsed songId:', songId);
+      if (!songId) {
+        console.log('Could not parse songId from path:', filePath);
+        return null;
+      }
+
+      // Update the Firestore document
+      await admin.firestore().collection('songs').doc(songId).update({
+        vector: features
+      });
+      console.log('Vector field added to Firestore for songId:', songId);
+
+      return null;
+    } catch (error) {
+      console.error('Error in extractAudioFeatures:', error);
+      return null;
+    }
+  });
+
+export const testStorageTrigger = functions
+  .region('us-central1')
+  .storage.object()
+  .onFinalize((object) => {
+    console.log('Test trigger fired for:', object.name);
+    return null;
+  }); 

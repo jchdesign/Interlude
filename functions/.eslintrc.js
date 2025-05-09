@@ -32,7 +32,8 @@ module.exports = {
     semi: 'off',
     'no-invalid-this': 'off',
     'operator-linebreak': 'off',
-    'valid-jsdoc': 'off'
+    'valid-jsdoc': 'off',
+    camelcase: 'off'
   },
   overrides: [
     {

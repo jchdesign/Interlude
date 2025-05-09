@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { WebSafeMaterialCommunityIcon } from '@/components/ui/WebSafeMaterialCommunityIcon';
 import { pickImage } from '@/storage';
 import { uploadSongCover, uploadAlbumCover, uploadSongAudio } from '@/storage';
 import { createSong, createPostFromTemporary } from '@/firestore';
@@ -10,6 +10,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { Colors } from '@/constants/Colors';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { useCreateMusic } from './CreateMusicContext';
+import { CameraIcon, PlusIcon, ChevronRightIcon } from 'react-native-heroicons/outline';
 
 export default function AddMusic() {
   const router = useRouter();
@@ -140,7 +141,7 @@ export default function AddMusic() {
           {songData.image ? (
             <Image source={{ uri: songData.image }} style={styles.coverImage} />
           ) : (
-            <MaterialCommunityIcons name="camera" size={40} color={Colors.dark.shayla} />
+            <CameraIcon size={40} color={Colors.dark.shayla} />
           )}
         </TouchableOpacity>
         
@@ -148,7 +149,7 @@ export default function AddMusic() {
           <ThemedText type='large' style={styles.label}>Upload File</ThemedText>
           <TouchableOpacity style={styles.uploadInput} onPress={handlePickAudio}>
               <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <MaterialCommunityIcons name="plus" size={24} color={Colors.dark.shayla} />
+                  <PlusIcon size={24} color={Colors.dark.shayla} />
                   <ThemedText style={styles.uploadInputText}>
                   {songData.audio ? 'Audio Selected' : '  .wav, .mp3, .m4a'}
                   </ThemedText>
@@ -181,7 +182,7 @@ export default function AddMusic() {
               <ThemedText style={styles.subLabelPlaceholder}>Select a couple of genres for this song.</ThemedText>
             )}
           </View>
-          <MaterialCommunityIcons name="chevron-right" size={22} color={Colors.dark.shayla} />
+          <ChevronRightIcon size={22} color={Colors.dark.shayla} />
         </TouchableOpacity>
 
         {/* Links */}
@@ -200,7 +201,7 @@ export default function AddMusic() {
               );
             })()}
           </View>
-          <MaterialCommunityIcons name="chevron-right" size={22} color={Colors.dark.shayla} />
+          <ChevronRightIcon size={22} color={Colors.dark.shayla} />
         </TouchableOpacity>
 
         {/* Year */}

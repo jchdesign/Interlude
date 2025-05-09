@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { View, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
+import { WebSafeMaterialCommunityIcon } from '@/components/ui/WebSafeMaterialCommunityIcon';
 import { Colors } from '@/constants/Colors';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useCreateMusic } from './CreateMusicContext';
+import { GlobeAltIcon } from 'react-native-heroicons/outline';
 
 const LINK_PLATFORMS = [
   { key: 'spotify', label: 'Spotify', icon: 'spotify' },
@@ -49,7 +50,8 @@ export default function AddMusicLinks() {
       <View style={{ marginTop: 24 }}>
         {LINK_PLATFORMS.map((platform, idx) => (
           <View key={platform.key} style={styles.linkRow}>
-            <MaterialCommunityIcons name={platform.icon as any} size={28} color={Colors.dark.textGrey} style={{ marginRight: 12 }} />
+            {/* TODO: Replace GlobeAltIcon with a more specific brand icon if desired */}
+            <GlobeAltIcon size={28} color={Colors.dark.textGrey} style={{ marginRight: 12 }} />
             <TextInput
               style={styles.linkInput}
               placeholder={platform.label}

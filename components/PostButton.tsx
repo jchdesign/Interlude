@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { PlusIcon } from 'react-native-heroicons/solid';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 
 interface PostButtonProps {
-  icon: keyof typeof MaterialCommunityIcons.glyphMap; // MaterialCommunityIcons icon name
+  icon?: React.ComponentType<any>;
   title: string;
   subtitle: string;
   onPress?: () => void;
@@ -16,7 +16,7 @@ interface PostButtonProps {
 }
 
 export const PostButton: React.FC<PostButtonProps> = ({
-  icon,
+  icon: Icon = PlusIcon,
   title,
   subtitle,
   onPress,
@@ -28,7 +28,7 @@ export const PostButton: React.FC<PostButtonProps> = ({
   return (
     <TouchableOpacity style={[styles.container, style]} onPress={onPress} activeOpacity={0.8}>
       <View style={[styles.iconContainer, { backgroundColor: iconBgColor }]}> 
-        <MaterialCommunityIcons name={icon} size={iconSize} color={iconColor} />
+        <Icon color={iconColor} size={iconSize} />
       </View>
       <View style={styles.textContainer}>
         <ThemedText type='h3'>{title}</ThemedText>

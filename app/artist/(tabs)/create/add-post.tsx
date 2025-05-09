@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { WebSafeMaterialCommunityIcon } from '@/components/ui/WebSafeMaterialCommunityIcon';
 import { pickImageOrVideo } from '@/storage'; // You need to implement this utility if not present
 import { uploadPostMedia } from '@/storage'; // You need to implement this utility if not present
 import { createPostFromTemporary } from '@/firestore';
@@ -11,6 +11,7 @@ import { useCreateMusic } from './CreateMusicContext';
 import { Video, ResizeMode } from 'expo-av';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 import MusicCard from '@/components/MusicCard';
+import { PlusIcon } from 'react-native-heroicons/outline';
 
 export default function AddPost() {
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function AddPost() {
       <View style={styles.formGroup}>
         <ThemedText type='large' style={styles.label}>Media</ThemedText>
         <TouchableOpacity style={styles.uploadInput} onPress={handlePickMedia} disabled={uploading}>
-          <MaterialCommunityIcons name="plus" size={32} color={Colors.dark.shayla} />
+          <PlusIcon size={32} color={Colors.dark.shayla} />
           <ThemedText type='h3' style={{color: Colors.dark.textGrey}}> Add Media</ThemedText>
         </TouchableOpacity>
         {uploading && <ActivityIndicator size="small" color={Colors.dark.pink} style={{ marginTop: 12 }} />}

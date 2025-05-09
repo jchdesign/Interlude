@@ -5,6 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { PostButton } from '@/components/PostButton';
 import { Colors } from '@/constants/Colors';
 import { useCreateMusic } from './CreateMusicContext';
+import { MusicalNoteIcon, ListBulletIcon } from 'react-native-heroicons/outline';
 
 const MUSIC_CATEGORIES = [
   {
@@ -70,6 +71,8 @@ export default function SelectMusicPostCategory() {
           onPress={() => handleCategorySelect(cat.category, cat.title)}
         />
       ))}
+      <PostButton icon={MusicalNoteIcon} title="Music" subtitle="Share a music post." />
+      <PostButton icon={ListBulletIcon} title="Playlist" subtitle="Share a playlist post." />
     </ScrollView>
   );
 }

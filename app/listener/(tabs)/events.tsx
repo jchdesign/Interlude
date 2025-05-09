@@ -10,7 +10,7 @@ export default function Events() {
         <ThemedText type="title">Events</ThemedText>
       </View>
       <View style={styles.content}>
-        <ThemedText>Upcoming events you're interested in will appear here</ThemedText>
+        <ThemedText>Stay tuned for upcoming events...</ThemedText>
       </View>
     </ScrollView>
   );

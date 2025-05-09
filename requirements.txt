@@ -1,0 +1,9 @@
+flask
+requests
+numpy
+librosa
+pandas
+matplotlib
+# Add any other dependencies your extract_features code needs, e.g.:
+# librosa 
+soundfile 

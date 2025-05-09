@@ -3,7 +3,7 @@ import { View, Image, StyleSheet, TouchableOpacity, Animated, PanResponder, Gest
 import { Audio, AVPlaybackStatus, AVPlaybackStatusSuccess } from 'expo-av';
 import { PlayerContext, SongData } from '@/context/PlayerContext';
 import { Colors } from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import { PlayIcon, PauseIcon } from 'react-native-heroicons/outline';
 import { ThemedText } from '@/components/ThemedText';
 
 export default function Player() {
@@ -106,7 +106,11 @@ export default function Player() {
       <View style={styles.progressRow}>
         <ThemedText style={styles.time}>{formatTime(position)}</ThemedText>
         <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
-          <Ionicons name={isPlaying ? 'pause' : 'play'} size={28} color={Colors.dark.blue} />
+          {isPlaying ? (
+            <PauseIcon size={28} color={Colors.dark.blue} />
+          ) : (
+            <PlayIcon size={28} color={Colors.dark.blue} />
+          )}
         </TouchableOpacity>
         <ThemedText style={styles.time}>{formatTime(duration)}</ThemedText>
       </View>

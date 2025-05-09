@@ -5,7 +5,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/firestore'
 import { useRouter } from 'expo-router'
 import { getFirestore } from 'firebase/firestore'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { ChevronRightIcon } from 'react-native-heroicons/outline'
 
 import PostContainer from '@/components/PostContainer'
 import { ThemedText } from '@/components/ThemedText'
@@ -125,7 +125,7 @@ export default function Home() {
       <View style={styles.recommendationsSection}>
         <TouchableOpacity style={styles.recommendationsHeader} onPress={() => router.push('./home/daily-recommendations')}>
           <ThemedText type='large' style={styles.recommendationsTitle}>Daily Recommendations</ThemedText>
-          <MaterialCommunityIcons name="chevron-right" size={26} color={Colors.dark.white} style={styles.chevron} />
+          <ChevronRightIcon size={26} color={Colors.dark.white} style={styles.chevron} />
         </TouchableOpacity>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recommendationsScroll}>
           {recommendations.map(songId => (
@@ -154,9 +154,10 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   logoContainer: {
-    height: 45,
+    height: 50,
     marginBottom: 24,
-    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   postsContainer: {
     display: 'flex',
@@ -164,9 +165,10 @@ const styles = StyleSheet.create({
     gap: 48
   },
   homeLogo: {
-    width: 150,
-    height: 45,
+    width: '60%',
+    height: '100%',
     resizeMode: 'contain',
+    alignSelf: 'center',
   },
   image: {
     width: width,

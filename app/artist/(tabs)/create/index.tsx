@@ -5,6 +5,7 @@ import { Colors } from '@/constants/Colors';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { TemporaryPostData } from '@/firestore';
+import { PlusIcon, MusicalNoteIcon, ListBulletIcon, VideoCameraIcon, ShoppingBagIcon, FilmIcon } from 'react-native-heroicons/outline';
 
 export default function Create() {
   const router = useRouter();
@@ -35,38 +36,38 @@ export default function Create() {
       <ThemedText type='h1' style={{marginBottom: 36}}>Create Post</ThemedText>
       <ThemedText type='h3' style={{marginBottom: 12}}>Share Something About Your Music</ThemedText>
       <PostButton
-        icon="plus"
+        icon={PlusIcon}
         title="Add Music"
         subtitle="Add new music to your profile"
         onPress={() => handlePostTypeSelect('music', 'add')}
       />
       <PostButton
-        icon="message-outline"
+        icon={MusicalNoteIcon}
         title="Post to Music Page"
         subtitle="Feature demos, videos, and song breakdowns of your releases"
         onPress={() => handlePostTypeSelect('music', 'post_to_page')}
       />
       <ThemedText type='h3' style={{marginBottom: 12, marginTop: 24}}>Share Something About You</ThemedText>
       <PostButton
-        icon="account"
+        icon={FilmIcon}
         title="Behind the Scenes"
         subtitle="Share daily check-ins, interviews, articles, and anything about you"
         onPress={() => handlePostTypeSelect('behind_scenes')}
       />
       <PostButton
-        icon="repeat"
+        icon={ListBulletIcon}
         title="Playlist"
         subtitle="A collection of songs for any occasion"
         onPress={() => handlePostTypeSelect('playlist')}
       />
       <PostButton
-        icon="bell-outline"
+        icon={VideoCameraIcon}
         title="Live Event"
         subtitle="Shout out your live event"
         onPress={() => handlePostTypeSelect('live_event')}
       />
       <PostButton
-        icon="chevron-right"
+        icon={ShoppingBagIcon}
         title="Merch"
         subtitle="Let your circle know about your swag"
         onPress={() => handlePostTypeSelect('merch')}

@@ -4,7 +4,7 @@ import { Video, ResizeMode } from 'expo-av';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { HeartIcon, ChatBubbleLeftIcon, PaperAirplaneIcon, ArrowPathIcon } from 'react-native-heroicons/outline';
 
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -183,10 +183,10 @@ export default function Post({ content }: Props) {
         <MusicCard songId={content.tag || content.song_id} />
       )}
       <View style={styles.interactionBar}>
-        <MaterialCommunityIcons name="heart-outline" size={28} color={Colors.dark.white} />
-        <MaterialCommunityIcons name="comment-outline" size={28} color={Colors.dark.white} />
-        <MaterialCommunityIcons name="send" size={28} color={Colors.dark.white} />
-        <MaterialCommunityIcons name="repeat-variant" size={28} color={Colors.dark.white} />
+        <HeartIcon color={Colors.dark.white} size={28} />
+        <ChatBubbleLeftIcon color={Colors.dark.white} size={28} />
+        <PaperAirplaneIcon color={Colors.dark.white} size={28} />
+        <ArrowPathIcon color={Colors.dark.white} size={28} />
       </View>
     </View>
   );

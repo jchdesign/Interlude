@@ -42,7 +42,7 @@ export const uploadPostImage = async (uri: string, postId: string): Promise<stri
 // Song-related storage functions (to be implemented later)
 export const uploadSongAudio = async (uri: string, songId: string): Promise<string | null> => {
   const path = `${STORAGE_PATHS.songs}/${songId}/audio/${Date.now()}.mp3`;
-  return uploadImage(uri, path);
+  return uploadAudio(uri, path);
 };
 
 export const uploadSongCover = async (uri: string, songId: string): Promise<string | null> => {
@@ -144,4 +144,31 @@ export const uploadPostMedia = async (uri: string, postId: string): Promise<stri
   const ext = extMatch ? extMatch[1] : 'media';
   const path = `${STORAGE_PATHS.posts}/${postId}/media/${Date.now()}.${ext}`;
   return uploadImage(uri, path);
+};
+
+const uploadAudio = async (uri: string, path: string): Promise<string | null> => {
+  try {
+    console.log('Starting audio upload...', { uri, path });
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    console.log('Audio blob created:', { size: blob.size, type: blob.type });
+
+    const storageRef = ref(storage, path);
+    console.log('Uploading audio blob to Firebase Storage...', { path });
+    const uploadResult = await uploadBytes(storageRef, blob);
+    console.log('Audio upload successful:', { 
+      path: uploadResult.ref.fullPath,
+      bucket: uploadResult.ref.bucket,
+      name: uploadResult.ref.name
+    });
+
+    console.log('Getting download URL...');
+    const downloadURL = await getDownloadURL(uploadResult.ref);
+    console.log('Download URL:', downloadURL);
+
+    return downloadURL;
+  } catch (error) {
+    console.error('Error in uploadAudio:', error);
+    return null;
+  }
 }; 
