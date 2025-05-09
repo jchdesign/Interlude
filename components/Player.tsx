@@ -3,7 +3,7 @@ import { View, Image, StyleSheet, TouchableOpacity, Animated, PanResponder, Gest
 import { Audio, AVPlaybackStatus, AVPlaybackStatusSuccess } from 'expo-av';
 import { PlayerContext, SongData } from '@/context/PlayerContext';
 import { Colors } from '@/constants/Colors';
-import { PlayIcon, PauseIcon } from 'react-native-heroicons/outline';
+import { PlayIcon, PauseIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { ThemedText } from '@/components/ThemedText';
 
 export default function Player() {
@@ -100,7 +100,7 @@ export default function Player() {
           </ThemedText>
         </View>
         <TouchableOpacity onPress={hidePlayer} style={styles.addButton}>
-          <Ionicons name="close" size={28} color={Colors.dark.textGrey} />
+          <XMarkIcon size={28} color={Colors.dark.textGrey} />
         </TouchableOpacity>
       </View>
       <View style={styles.progressRow}>

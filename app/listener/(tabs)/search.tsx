@@ -254,7 +254,7 @@ export default function Search() {
   }, [selectedTab, profileFilter]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { flex: 1 }]}>
       {/* Tabs */}
       <View style={styles.tabBarWrapper}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabBar}>
@@ -296,8 +296,8 @@ export default function Search() {
               </TouchableOpacity>
             ))}
           </View>
-          {profileSearchQuery.trim() === '' && (
-            <View style={{ marginBottom: 16 }}>
+          {profileSearchQuery.trim() === '' ? (
+            <View style={{ marginBottom: 16, flex: 1 }}>
               <ThemedText type="h3" style={{ marginBottom: 8 }}>Recommended</ThemedText>
               <FlatList
                 data={recommendedProfiles}
@@ -307,17 +307,20 @@ export default function Search() {
                 contentContainerStyle={[styles.gridContainer, { marginTop: 0 }]}
                 renderItem={renderArtistCard}
                 ListEmptyComponent={null}
+                style={{ flex: 1 }}
               />
             </View>
+          ) : (
+            <FlatList
+              data={results}
+              keyExtractor={item => item.id}
+              numColumns={2}
+              columnWrapperStyle={styles.gridRow}
+              contentContainerStyle={[styles.gridContainer, { marginTop: 0 }]}
+              renderItem={renderArtistCard}
+              style={{ flex: 1 }}
+            />
           )}
-          <FlatList
-            data={results}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            columnWrapperStyle={styles.gridRow}
-            contentContainerStyle={[styles.gridContainer, { marginTop: 0 }]}
-            renderItem={renderArtistCard}
-          />
         </>
       )}
       {/* Songs Tab */}
@@ -334,24 +337,27 @@ export default function Search() {
               onQueryChange={setMusicSearchQuery}
             />
           </View>
-          {musicSearchQuery.trim() === '' && (
-            <View style={{ marginBottom: 16 }}>
+          {musicSearchQuery.trim() === '' ? (
+            <View style={{ marginBottom: 16, flex: 1, width: '100%', height: '100%' }}>
               <ThemedText type="h3" style={{ marginBottom: 8 }}>Recommended</ThemedText>
               <FlatList
                 data={recommendedSongs}
                 keyExtractor={item => item.id}
-                contentContainerStyle={[styles.gridContainer, { marginTop: 0 }]}
+                contentContainerStyle={[styles.gridContainer, { marginTop: 0, width: '100%' }]}
                 renderItem={renderSongCard}
                 ListEmptyComponent={null}
+                style={{ flex: 1, width: '100%' }}
               />
             </View>
-          )}
-          <FlatList
+          ) : (
+            <FlatList
             data={songResults}
             keyExtractor={item => item.id}
             contentContainerStyle={[styles.gridContainer, { marginTop: 0 }]}
             renderItem={renderSongCard}
+            style={{ flex: 1 }}
           />
+        )}
         </>
       )}
       {/* Other tabs can be implemented later */}

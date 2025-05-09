@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions, View, Text, ScrollView, Image, Platform, ImageBackground, TouchableOpacity } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import React from 'react';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, collection, getDocs, query, where, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/firestore';
@@ -72,6 +73,9 @@ export function ArtistProfile({ userId, isOwnProfile, viewerId }: ArtistProfileP
   const [selectedPostTab, setSelectedPostTab] = useState<'behind_scenes' | 'live_event' | 'playlist' | 'merch'>('behind_scenes');
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [viewerRole, setViewerRole] = useState<string | null>(null);
+  const [wrappedArtistName, setWrappedArtistName] = useState<string | null>(null);
+  const containerWidth = useRef(0);
+  const textWidth = useRef(0);
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -204,6 +208,22 @@ export function ArtistProfile({ userId, isOwnProfile, viewerId }: ArtistProfileP
     }
   };
 
+  // Helper to insert a line break at the last space if needed
+  const handleArtistNameLayout = (e: any) => {
+    textWidth.current = e.nativeEvent.layout.width;
+    if (containerWidth.current && textWidth.current > containerWidth.current) {
+      const name = artistData?.name || '';
+      const lastSpace = name.lastIndexOf(' ');
+      if (lastSpace !== -1) {
+        setWrappedArtistName(name.slice(0, lastSpace) + '\n' + name.slice(lastSpace + 1));
+      } else {
+        setWrappedArtistName(name);
+      }
+    } else {
+      setWrappedArtistName(null);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -227,9 +247,17 @@ export function ArtistProfile({ userId, isOwnProfile, viewerId }: ArtistProfileP
         source={coverPhotoUrl ? { uri: coverPhotoUrl } : require("../assets/images/artist/default_cover_image.png")}
       >
         <View style={styles.container}>
-          <View style={styles.artistNameWrapper}>
-            <ThemedText style={styles.artistName}>
-              {artistData.name}
+          <View style={styles.artistNameWrapper} onLayout={e => { containerWidth.current = e.nativeEvent.layout.width; }}>
+            <ThemedText
+              style={styles.artistName}
+              onLayout={handleArtistNameLayout}
+            >
+              {(wrappedArtistName ?? artistData.name).split('\n').map((line, idx) => (
+                <React.Fragment key={idx}>
+                  {line}
+                  {idx !== (wrappedArtistName ?? artistData.name).split('\n').length - 1 && '\n'}
+                </React.Fragment>
+              ))}
             </ThemedText>
           </View>
           <View style={styles.artistInfoWrapper}>
@@ -422,7 +450,7 @@ const styles = StyleSheet.create({
     padding: 12,
     alignSelf: 'flex-start',
     flexDirection: 'column',
-    maxWidth: '100%',
+    maxWidth: screenWidth - 48,
     paddingRight: 24,
   },
   artistName: {
@@ -431,9 +459,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'white',
     lineHeight: 72,
-    alignSelf: 'flex-start',
     flexWrap: 'wrap',
-    width: '100%',
+    maxWidth: '100%',
+    flexShrink: 1,
   },
   socialLinksContainer: {
     flexDirection: 'row',

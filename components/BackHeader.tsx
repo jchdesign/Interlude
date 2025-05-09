@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View, StyleSheet, Pressable } from 'react-native';
 import { ThemedText } from './ThemedText';
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronLeftIcon } from 'react-native-heroicons/outline';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 type Props = { text: string };
@@ -11,7 +11,7 @@ export function BackHeader({ text }: Props) {
     return (
         <View style={styles.container}>
             <Pressable onPress={() => router.back()} style={styles.arrowContainer} hitSlop={10}>
-                <Ionicons name="chevron-back" size={24} color={Colors.dark.shayla} />
+                <ChevronLeftIcon size={24} color={Colors.dark.shayla} />
             </Pressable>
             <View style={styles.textContainer}>
                 <ThemedText type='h3'>{text}</ThemedText>

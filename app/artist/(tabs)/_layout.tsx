@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform, View, Pressable } from 'react-native';
-import { HomeIcon, MagnifyingGlassIcon, PlusCircleIcon, UserCircleIcon } from 'react-native-heroicons/outline';
+import { HomeIcon, MagnifyingGlassIcon, PlusCircleIcon, UserCircleIcon, CalendarIcon } from 'react-native-heroicons/outline';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
@@ -44,13 +44,14 @@ export default function TabLayout() {
     search: MagnifyingGlassIcon,
     create: PlusCircleIcon,
     profile: UserCircleIcon,
+    events: CalendarIcon,
   };
 
   return (
     <Tabs
       screenOptions={({ route }) => {
         return {
-          tabBarActiveTintColor: Colors.dark.white,
+          tabBarActiveTintColor: Colors.dark.pink,
           tabBarInactiveTintColor: Colors.dark.white,
           headerShown: false,
           tabBarButton: (props) => <CustomTabBarButton {...props} />,

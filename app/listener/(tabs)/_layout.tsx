@@ -51,7 +51,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={({ route }) => {
         return {
-          tabBarActiveTintColor: Colors.dark.white,
+          tabBarActiveTintColor: Colors.dark.pink,
           tabBarInactiveTintColor: Colors.dark.white,
           headerShown: false,
           tabBarButton: (props) => <CustomTabBarButton {...props} />,

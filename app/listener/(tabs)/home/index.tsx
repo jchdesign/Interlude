@@ -1,4 +1,4 @@
-import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, TouchableOpacity } from 'react-native'
+import { View, ScrollView, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native'
 import { useEffect, useState } from 'react'
 import { getAuth } from 'firebase/auth'
 import { collection, query, where, getDocs } from 'firebase/firestore'
@@ -11,7 +11,7 @@ import PostContainer from '@/components/PostContainer'
 import { ThemedText } from '@/components/ThemedText'
 import MusicCard from '@/components/MusicCard'
 
-const { width } = Dimensions.get('window')
+const { width: screenWidth } = Dimensions.get('window')
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -116,10 +116,11 @@ export default function Home() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.logoContainer}>
-        <ImageBackground
+        <Image
           source={require('../../../../assets/images/interlude_logo.png')}
           style={styles.homeLogo}
-        ></ImageBackground>
+          resizeMode="contain"
+        />
       </View>
       {/* Daily Recommendations Section */}
       <View style={styles.recommendationsSection}>
@@ -154,10 +155,11 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   logoContainer: {
-    height: 50,
+    marginTop: 24,
     marginBottom: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   postsContainer: {
     display: 'flex',
@@ -165,13 +167,12 @@ const styles = StyleSheet.create({
     gap: 48
   },
   homeLogo: {
-    width: '60%',
-    height: '100%',
-    resizeMode: 'contain',
+    height: 52,
     alignSelf: 'center',
+    resizeMode: 'contain',
   },
   image: {
-    width: width,
+    width: screenWidth,
     height: "50%",
     flex: 1,
     justifyContent: 'center',
